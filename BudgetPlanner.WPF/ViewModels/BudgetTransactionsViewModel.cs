@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 using BudgetPlanner.DAL.Data;
 using BudgetPlanner.DAL.Interfaces;
 using BudgetPlanner.DAL.Models;
@@ -20,6 +21,7 @@ namespace BudgetPlanner.WPF.ViewModels
     {
         private readonly IBudgetTransactionRepository repository;
         public ObservableCollection<BudgetTransactionItemsViewModel> BudgetTransactions { get; set; } = new();
+        public ICollectionView TransactionsView { get; }
 
         // Ny transaktion
         public DateTime NewTransactionDate { get; set; } = DateTime.Today;
@@ -28,6 +30,65 @@ namespace BudgetPlanner.WPF.ViewModels
         public Recurrence NewTransactionRecurrence { get; set; } = Recurrence.OneTime;
         public String NewTransactionDescription { get; set; }
 
+        // Filteregenskaper summeringar
+        private bool _showOneTime = true;
+        public bool ShowOneTime
+        {
+            get => _showOneTime;
+            set
+            {
+                _showOneTime = value;
+                RaisePropertyChanged();
+                RaisePropertyChangedFilteredSummarys();
+            }
+        }
+
+        private bool _showMonthly = true;
+        public bool ShowMonthly
+        {
+            get => _showMonthly;
+            set
+            {
+                _showMonthly = value;
+                RaisePropertyChanged();
+                RaisePropertyChangedFilteredSummarys();
+            }
+        }
+
+        private bool _showYearly = true;
+        public bool ShowYearly
+        {
+            get => _showYearly;
+            set
+            {
+                _showYearly = value;
+                RaisePropertyChanged();
+                RaisePropertyChangedFilteredSummarys();
+            }
+        }
+
+        //Filteregenskaper kategorier
+        private Category? _selectedFilterCategory;
+        public Category? SelectedFilterCategory
+        {
+            get => _selectedFilterCategory;
+            set
+            {
+                _selectedFilterCategory = value;
+                RaisePropertyChanged();
+                RaisePropertyChangedFilteredSummarys();
+            }
+        }
+
+
+        private void RaisePropertyChangedFilteredSummarys()
+        {
+            TransactionsView.Refresh();
+            RaisePropertyChanged(nameof(FilteredTotalIncome));
+            RaisePropertyChanged(nameof(FilteredTotalExpense));
+            RaisePropertyChanged(nameof(FilteredTotalResult));
+            RaisePropertyChanged(nameof(FilteredMonthlyForecast));
+        }
 
         // Kategorier
         public ObservableCollection<Category> Categories { get; set; } = new();
@@ -47,6 +108,7 @@ namespace BudgetPlanner.WPF.ViewModels
 
         public DelegateCommand AddCommand { get; }
         public DelegateCommand DeleteCommand { get; }
+        public DelegateCommand ClearCategoryFilterCommand { get; }
 
         // Summeringar
         public decimal TotalIncome =>
@@ -75,6 +137,10 @@ namespace BudgetPlanner.WPF.ViewModels
 
             AddCommand = new DelegateCommand(AddTransaction);
             DeleteCommand = new DelegateCommand(DeleteTransaction, CanDelete);
+            ClearCategoryFilterCommand = new DelegateCommand(_ =>
+            {
+                SelectedFilterCategory = null;
+            });
 
             BudgetTransactions.CollectionChanged += (_, __) =>
             {
@@ -83,6 +149,9 @@ namespace BudgetPlanner.WPF.ViewModels
                 RaisePropertyChanged(nameof(TotalResult));
                 RaisePropertyChanged(nameof(MonthlyForecast));
             };
+
+            TransactionsView = CollectionViewSource.GetDefaultView(BudgetTransactions);
+            TransactionsView.Filter = FilterTransactions;
         }
 
         public async Task LoadCategories()
@@ -103,6 +172,7 @@ namespace BudgetPlanner.WPF.ViewModels
             {
                 BudgetTransactions.Add(new BudgetTransactionItemsViewModel(t));
             }
+            RaisePropertyChangedFilteredSummarys();
         }
 
         private bool CanDelete(object? parameter) => SelectedTransaction != null;
@@ -114,6 +184,7 @@ namespace BudgetPlanner.WPF.ViewModels
                 await repository.DeleteAsync(SelectedTransaction.Model);
                 BudgetTransactions.Remove(SelectedTransaction);
                 SelectedTransaction = null;
+                RaisePropertyChangedFilteredSummarys();
             }
         }
 
@@ -132,6 +203,7 @@ namespace BudgetPlanner.WPF.ViewModels
 
             await repository.AddAsync(transaction);
             BudgetTransactions.Add(new BudgetTransactionItemsViewModel(transaction));
+            RaisePropertyChangedFilteredSummarys();
 
             // Nollställ formuläret
             NewTransactionDate = DateTime.Today;
@@ -146,5 +218,42 @@ namespace BudgetPlanner.WPF.ViewModels
             RaisePropertyChanged(nameof(NewTransactionRecurrence));
             RaisePropertyChanged(nameof(NewTransactionDescription));
         }
+
+        private bool FilterTransactions(object obj)
+        {
+            if (obj is not BudgetTransactionItemsViewModel vm)
+                return false;
+
+            bool recurrenceMatches =
+                (ShowOneTime && vm.Recurrence == Recurrence.OneTime) ||
+                (ShowMonthly && vm.Recurrence == Recurrence.Monthly) ||
+                (ShowYearly && vm.Recurrence == Recurrence.Yearly);
+
+            bool categoryMatches = SelectedFilterCategory == null || vm.Category?.Id == SelectedFilterCategory.Id;
+
+            return recurrenceMatches && categoryMatches;
+        }
+
+        //Summeringar av filtrerade transaktioner
+        public decimal FilteredTotalIncome => TransactionsView.Cast<BudgetTransactionItemsViewModel>()
+    .Where(t => t.Type == TransactionType.Income)
+    .Sum(t => t.Amount);
+
+        public decimal FilteredTotalExpense => TransactionsView.Cast<BudgetTransactionItemsViewModel>()
+            .Where(t => t.Type == TransactionType.Expense)
+            .Sum(t => t.Amount);
+
+        public decimal FilteredTotalResult => FilteredTotalIncome - FilteredTotalExpense;
+
+        public decimal FilteredMonthlyForecast => TransactionsView.Cast<BudgetTransactionItemsViewModel>()
+            .Where(t => t.IsActive)
+            .Sum(t => t.Recurrence switch
+            {
+                Recurrence.Monthly => t.Amount,
+                Recurrence.Yearly => t.Amount / 12,
+                _ => 0
+            });
+
+
     }
 }
