@@ -51,7 +51,26 @@
                     <GridViewColumn Header="Kategori" Width="120" DisplayMemberBinding="{Binding Category.Name}" />
                     <GridViewColumn Header="Typ" Width="80" DisplayMemberBinding="{Binding Type}" />
                     <GridViewColumn Header="Återkommande" Width="100" DisplayMemberBinding="{Binding Recurrence}" />
-                    <GridViewColumn Header="Belopp" Width="80" DisplayMemberBinding="{Binding Amount, StringFormat=C}" />
+                    <GridViewColumn Header="Belopp" Width="80">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="{Binding Amount, StringFormat=C}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Type}" Value="Expense">
+                                                    <Setter Property="Text" Value="{Binding Amount, StringFormat=-{0:C}}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+
                 </GridView>
             </ListView.View>
         </ListView>
@@ -64,24 +83,30 @@
                 <TextBlock Text="Datum:" Width="80"/>
                 <DatePicker SelectedDate="{Binding NewTransactionDate}" Width="150"/>
             </StackPanel>
-            
+
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                 <TextBlock Text="Anteckning:" Width="80"/>
                 <TextBox Text="{Binding NewTransactionDescription}" Width="150"/>
             </StackPanel>
 
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                 <TextBlock Text="Belopp:" Width="80"/>
                 <TextBox Text="{Binding NewTransactionAmount}" Width="150"/>
             </StackPanel>
 
+
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                 <TextBlock Text="Kategori:" Width="80"/>
                 <ComboBox ItemsSource="{Binding Categories}"
-                          SelectedItem="{Binding NewTransactionCategory}"
-                          DisplayMemberPath="Name"
-                          Width="150"/>
+              SelectedItem="{Binding NewTransactionCategory}"
+              Width="150"
+                          ItemTemplate="{StaticResource CategoryComboBoxItemTemplate}"
+                          ItemContainerStyle="{StaticResource CategoryComboBoxItemStyle}">
+                </ComboBox>
             </StackPanel>
+
+
+
 
             <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
                 <TextBlock Text="Återkommande:" Width="80"/>
@@ -94,21 +119,28 @@
                 <Button Content="Ta bort" Command="{Binding DeleteCommand}" Width="80"/>
             </StackPanel>
 
-<!-- Filtrering Summeringar-->
+            <!-- Filtrering Summeringar-->
             <StackPanel Margin="0,20,0,0" HorizontalAlignment="Left">
                 <TextBlock Text="Filter" Width="80" Margin="0,10,0,0"/>
-            <CheckBox Content="OneTime" IsChecked="{Binding ShowOneTime}" />
-            <CheckBox Content="Monthly" IsChecked="{Binding ShowMonthly}" />
-            <CheckBox Content="Yearly" IsChecked="{Binding ShowYearly}"/>
+                <CheckBox Content="OneTime" IsChecked="{Binding ShowOneTime}" />
+                <CheckBox Content="Monthly" IsChecked="{Binding ShowMonthly}" />
+                <CheckBox Content="Yearly" IsChecked="{Binding ShowYearly}"/>
+
+                <!-- Filter för typ -->
+                <CheckBox Content="Inkomster" IsChecked="{Binding ShowIncome}" />
+                <CheckBox Content="Utgifter" IsChecked="{Binding ShowExpense}" />
             </StackPanel>
         </StackPanel>
+        
+        
         <StackPanel Grid.Row="1" Grid.Column="1">
             <!-- Kategorifilter -->
             <TextBlock Text="Kategori:" Margin="0,10,0,0"/>
             <ComboBox ItemsSource="{Binding Categories}"
           SelectedItem="{Binding SelectedFilterCategory}"
-          DisplayMemberPath="Name"
-          Width="150">
+          Width="150"
+          ItemTemplate="{StaticResource CategoryComboBoxItemTemplate}"
+          ItemContainerStyle="{StaticResource CategoryComboBoxItemStyle}">
 
             </ComboBox>
             <Button Content="Rensa filter" Width="100" Margin="0,5,0,0"

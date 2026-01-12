@@ -13,6 +13,29 @@
         </ResourceDictionary>-->
 
 
+        <!-- Återanvändbar stil för kategoricomboBox -->
+        <Style x:Key="CategoryComboBoxItemStyle" TargetType="ComboBoxItem">
+            <Setter Property="Background" Value="White"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Type}" Value="Income">
+                    <Setter Property="Background" Value="LightGreen"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Type}" Value="Expense">
+                    <Setter Property="Background" Value="LightCoral"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Återanvändbar DataTemplate -->
+        <DataTemplate x:Key="CategoryComboBoxItemTemplate">
+            <TextBlock Text="{Binding Name}" />
+        </DataTemplate>
+        
+        
+        
+
+
+
         <SolidColorBrush Color="Red" x:Key="BackgroundBrush"/>
         <SolidColorBrush Color="Green" x:Key="TextBackgroundBrush"/>
         <SolidColorBrush Color="Blue" x:Key="ButtonBackgroundBrush"/>

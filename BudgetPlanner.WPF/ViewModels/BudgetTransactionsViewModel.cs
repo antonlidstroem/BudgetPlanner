@@ -80,6 +80,37 @@ namespace BudgetPlanner.WPF.ViewModels
             }
         }
 
+        //Filteregenskaper utgifter inkomster
+        private bool _showIncome = true;
+        public bool ShowIncome
+        {
+            get => _showIncome;
+            set
+            {
+                if (_showIncome != value)
+                {
+                    _showIncome = value;
+                    RaisePropertyChanged();
+                    TransactionsView.Refresh();
+                }
+            }
+        }
+
+        private bool _showExpense = true;
+        public bool ShowExpense
+        {
+            get => _showExpense;
+            set
+            {
+                if (_showExpense != value)
+                {
+                    _showExpense = value;
+                    RaisePropertyChanged();
+                    TransactionsView.Refresh();
+                }
+            }
+        }
+
 
         private void RaisePropertyChangedFilteredSummarys()
         {
@@ -231,13 +262,17 @@ namespace BudgetPlanner.WPF.ViewModels
 
             bool categoryMatches = SelectedFilterCategory == null || vm.Category?.Id == SelectedFilterCategory.Id;
 
-            return recurrenceMatches && categoryMatches;
+            bool typeMatches =
+                (ShowIncome && vm.Type == TransactionType.Income) ||
+                (ShowExpense && vm.Type == TransactionType.Expense);
+
+            return recurrenceMatches && categoryMatches && typeMatches;
         }
 
         //Summeringar av filtrerade transaktioner
         public decimal FilteredTotalIncome => TransactionsView.Cast<BudgetTransactionItemsViewModel>()
-    .Where(t => t.Type == TransactionType.Income)
-    .Sum(t => t.Amount);
+            .Where(t => t.Type == TransactionType.Income)
+            .Sum(t => t.Amount);
 
         public decimal FilteredTotalExpense => TransactionsView.Cast<BudgetTransactionItemsViewModel>()
             .Where(t => t.Type == TransactionType.Expense)
@@ -247,12 +282,13 @@ namespace BudgetPlanner.WPF.ViewModels
 
         public decimal FilteredMonthlyForecast => TransactionsView.Cast<BudgetTransactionItemsViewModel>()
             .Where(t => t.IsActive)
-            .Sum(t => t.Recurrence switch
+            .Sum(t => (t.Type == TransactionType.Income ? 1 : -1) * (t.Recurrence switch
             {
                 Recurrence.Monthly => t.Amount,
                 Recurrence.Yearly => t.Amount / 12,
                 _ => 0
-            });
+       }));
+
 
 
     }
