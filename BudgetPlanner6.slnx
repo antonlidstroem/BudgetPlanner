@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="BudgetPlanner.DAL/BudgetPlanner.DAL.csproj" />
+  <Project Path="BudgetPlanner.WPF/BudgetPlanner.WPF.csproj" />
+</Solution>

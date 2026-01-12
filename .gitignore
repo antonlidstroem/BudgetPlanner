@@ -1,0 +1,58 @@
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.slnx/
+
+# Build output
+bin/
+obj/
+Debug/
+Release/
+x64/
+x86/
+
+# Rider
+.idea/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+# Paketrestore
+*.nuget.props
+*.nuget.targets
+
+# Visual Studio cache files
+*.cache
+*.ilk
+*.pdb
+*.idb
+*.ipdb
+*.log
+*.tlog
+*.tmp
+*.tmp_proj
+*.lastbuildstate
+
+# OS generated
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.DS_Store
+ehthumbs.db
+Icon?
+.DS_Store?
+
+# User-specific files
+*.pidb
+*.svclog
+*.userprefs
+
+# IIS Express
+/IISExpress/
+
+# Publish folder
+publish/
