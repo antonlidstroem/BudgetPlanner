@@ -30,6 +30,28 @@ namespace BudgetPlanner.WPF.ViewModels
         public Recurrence NewTransactionRecurrence { get; set; } = Recurrence.OneTime;
         public String NewTransactionDescription { get; set; }
 
+
+        // Ny transaktionsmånad 
+        private int _newTransactionMonth = DateTime.Today.Month;
+        public int NewTransactionMonth
+        {
+            get => _newTransactionMonth;
+            set
+            {
+                if (_newTransactionMonth != value)
+                {
+                    _newTransactionMonth = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        // Lista med månader för ComboBox
+        public List<int> Months { get; } = Enumerable.Range(1, 12).ToList();
+
+
+
+
         // Filteregenskaper summeringar
         private bool _showOneTime = true;
         public bool ShowOneTime
@@ -230,6 +252,7 @@ namespace BudgetPlanner.WPF.ViewModels
                 CategoryId = NewTransactionCategory.Id,
                 Recurrence = NewTransactionRecurrence,
                 Description = NewTransactionDescription,
+                Month = NewTransactionRecurrence == Recurrence.Yearly ? NewTransactionMonth : null
             };
 
             await repository.AddAsync(transaction);

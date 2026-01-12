@@ -22,6 +22,8 @@ namespace BudgetPlanner.DAL.Models
         public Category? Category { get; set; }
         public Recurrence Recurrence { get; set; }
         public bool IsActive { get; set; } = true;
+        public int? Month { get; set; }
+
 
         public TransactionType Type => Category?.Type ?? TransactionType.Expense;
 
