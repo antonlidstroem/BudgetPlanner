@@ -26,6 +26,7 @@ namespace BudgetPlanner.WPF.ViewModels
         public decimal NewTransactionAmount { get; set; }
         public Category? NewTransactionCategory { get; set; }
         public Recurrence NewTransactionRecurrence { get; set; } = Recurrence.OneTime;
+        public String NewTransactionDescription { get; set; }
 
 
         // Kategorier
@@ -72,10 +73,8 @@ namespace BudgetPlanner.WPF.ViewModels
             var db = new BudgetDbContext();
             repository = new BudgetTransactionRepository(db);
 
-
             AddCommand = new DelegateCommand(AddTransaction);
             DeleteCommand = new DelegateCommand(DeleteTransaction, CanDelete);
-
 
             BudgetTransactions.CollectionChanged += (_, __) =>
             {
@@ -128,6 +127,7 @@ namespace BudgetPlanner.WPF.ViewModels
                 Amount = NewTransactionAmount,
                 CategoryId = NewTransactionCategory.Id,
                 Recurrence = NewTransactionRecurrence,
+                Description = NewTransactionDescription,
             };
 
             await repository.AddAsync(transaction);
@@ -138,11 +138,13 @@ namespace BudgetPlanner.WPF.ViewModels
             NewTransactionAmount = 0;
             NewTransactionCategory = null;
             NewTransactionRecurrence = Recurrence.OneTime;
+            NewTransactionDescription = string.Empty;
 
             RaisePropertyChanged(nameof(NewTransactionDate));
             RaisePropertyChanged(nameof(NewTransactionAmount));
             RaisePropertyChanged(nameof(NewTransactionCategory));
             RaisePropertyChanged(nameof(NewTransactionRecurrence));
+            RaisePropertyChanged(nameof(NewTransactionDescription));
         }
     }
 }

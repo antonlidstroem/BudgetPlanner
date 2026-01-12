@@ -9,7 +9,10 @@
 
         
         mc:Ignorable="d"
-        Title="Budgetplanerare" Height="600" Width="900">
+        Title="Budgetplanerare" 
+        SizeToContent="Width"
+        Height="600" 
+        MinWidth="750">
 
     <Window.Resources>
         <Style TargetType="GridViewColumnHeader">
@@ -27,7 +30,7 @@
 
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="4*"/>
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -42,6 +45,7 @@
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Datum" Width="100" DisplayMemberBinding="{Binding Date, StringFormat=d}" />
+                    <GridViewColumn Header="Anteckning" Width="200" DisplayMemberBinding="{Binding Description}" />
                     <GridViewColumn Header="Belopp" Width="80" DisplayMemberBinding="{Binding Amount}" />
                     <GridViewColumn Header="Kategori" Width="120" DisplayMemberBinding="{Binding Category.Name}" />
                     <GridViewColumn Header="Typ" Width="80" DisplayMemberBinding="{Binding Type}" />
@@ -58,8 +62,13 @@
                 <TextBlock Text="Datum:" Width="80"/>
                 <DatePicker SelectedDate="{Binding NewTransactionDate}" Width="150"/>
             </StackPanel>
-
+            
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBlock Text="Anteckning:" Width="80"/>
+                <TextBox Text="{Binding NewTransactionDescription}" Width="150"/>
+            </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                 <TextBlock Text="Belopp:" Width="80"/>
                 <TextBox Text="{Binding NewTransactionAmount}" Width="150"/>
             </StackPanel>
