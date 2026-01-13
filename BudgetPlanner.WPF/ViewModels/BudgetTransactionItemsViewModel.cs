@@ -63,6 +63,27 @@ namespace BudgetPlanner.WPF.ViewModels
             }
         }
 
+        public decimal? TaxRate 
+        {
+            get { return model.TaxRate; }
+            set
+            {
+                model.TaxRate = value;
+                RaisePropertyChanged();
+            }
+        }
+
+
+        public bool? IsGrossIncome
+        {     get { return model.IsGrossIncome; }
+            set
+            {
+                model.IsGrossIncome = value;
+                RaisePropertyChanged();
+            }
+        }
+
+
         public Category? Category
         {
             get { return model.Category; }

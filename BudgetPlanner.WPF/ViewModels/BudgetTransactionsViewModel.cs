@@ -25,7 +25,7 @@ namespace BudgetPlanner.WPF.ViewModels
         private bool _isInEditMode;
         private bool _isExitingEditMode = false;
 
-        private int _transactionMonth = DateTime.Today.Month;
+        private int? _transactionMonth = null;
         private bool _showOneTime = true;
         private bool _showMonthly = true;
         private bool _showYearly = true;
@@ -52,11 +52,27 @@ namespace BudgetPlanner.WPF.ViewModels
         #region New Transaction Properties
         public DateTime TransactionDate { get; set; } = DateTime.Today;
         public decimal TransactionAmount { get; set; }
-        public Category? TransactionCategory { get; set; }
-        //public Recurrence TransactionRecurrence { get; set; } = Recurrence.OneTime;
+        public Category? TransactionCategory
+        {
+            get => _transactionCategory;
+            set
+            {
+                if (_transactionCategory != value)
+                {
+                    _transactionCategory = value;
+                    RaisePropertyChanged();
+                    RaisePropertyChanged(nameof(IsIncomeCategorySelected));
+                    RaisePropertyChanged(nameof(MonthVisibility));
+                    RaisePropertyChanged(nameof(ShowIncomeOptions));
+
+                }
+            }
+        }
+        private Category? _transactionCategory;
+
 
         public string TransactionDescription { get; set; } = string.Empty;
-        public int TransactionMonth
+        public int? TransactionMonth
         {
             get => _transactionMonth;
             set
@@ -152,7 +168,7 @@ namespace BudgetPlanner.WPF.ViewModels
                     base.RaisePropertyChanged();
                     UpdateCommand.RaiseCanExecuteChanged();
                     CancelEditCommand.RaiseCanExecuteChanged();
-                    AddCommand.RaiseCanExecuteChanged();          
+                    AddCommand.RaiseCanExecuteChanged();
                 }
             }
         }
@@ -184,24 +200,36 @@ namespace BudgetPlanner.WPF.ViewModels
         public decimal TotalResult => TotalIncome - TotalExpense;
         public decimal MonthlyForecast => BudgetTransactions
             .Where(t => t.IsActive)
-            .Sum(t => t.Recurrence switch
+            .Sum(t =>
             {
-                Recurrence.Monthly => t.Amount,
-                Recurrence.Yearly => t.Amount / 12,
-                _ => 0
+                return t.Recurrence switch
+                {
+                    Recurrence.Monthly => t.Amount,
+                    Recurrence.Yearly => t.Amount / 12,
+                    _ => 0
+                };
             });
+
+
 
         public decimal FilteredTotalIncome => TransactionsView.Cast<BudgetTransactionItemsViewModel>().Where(t => t.Type == TransactionType.Income).Sum(t => t.Amount);
         public decimal FilteredTotalExpense => TransactionsView.Cast<BudgetTransactionItemsViewModel>().Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount);
         public decimal FilteredTotalResult => FilteredTotalIncome - FilteredTotalExpense;
-        public decimal FilteredMonthlyForecast => TransactionsView.Cast<BudgetTransactionItemsViewModel>()
+        public decimal FilteredMonthlyForecast =>
+            TransactionsView.Cast<BudgetTransactionItemsViewModel>()
             .Where(t => t.IsActive)
-            .Sum(t => (t.Type == TransactionType.Income ? 1 : -1) * (t.Recurrence switch
+            .Sum(t =>
             {
-                Recurrence.Monthly => t.Amount,
-                Recurrence.Yearly => t.Amount / 12,
-                _ => 0
-            }));
+                int sign = t.Type == TransactionType.Income ? 1 : -1;
+
+                return t.Recurrence switch
+                {
+                    Recurrence.Monthly => t.Amount * sign,
+                    Recurrence.Yearly => (t.Amount / 12) * sign,
+                    _ => 0
+                };
+            });
+
         #endregion
 
         #region Constructor
@@ -270,27 +298,39 @@ namespace BudgetPlanner.WPF.ViewModels
             }
         }
 
+
         private async void AddTransaction(object? parameter)
         {
-            try { 
-            if (TransactionCategory == null || TransactionAmount <= 0) return;
-
-            var transaction = new BudgetTransaction
+            try
             {
-                Date = TransactionDate,
-                Amount = TransactionAmount,
-                CategoryId = TransactionCategory.Id,
-                Recurrence = TransactionRecurrence,
-                Description = TransactionDescription,
-                Month = TransactionRecurrence == Recurrence.Yearly ? TransactionMonth : null
-            };
 
-            await repository.AddAsync(transaction);
-            BudgetTransactions.Add(new BudgetTransactionItemsViewModel(transaction));
-            RefreshFilteredSummaries();
 
-            ClearTransactionForm();
-        }
+                if (TransactionCategory == null || TransactionAmount <= 0) return;
+
+                decimal finalAmount = TransactionAmount;
+
+                if (TransactionCategory.Name == "Lön" && IsGrossIncome)
+                {
+                    finalAmount = TransactionAmount * (1 - (TaxRate / 100m));
+                }
+
+                var transaction = new BudgetTransaction
+                {
+                    Date = TransactionDate,
+                    Amount = finalAmount,
+                    CategoryId = TransactionCategory.Id,
+                    Recurrence = TransactionRecurrence,
+                    Description = TransactionDescription,
+                    Month = TransactionRecurrence == Recurrence.Yearly ? TransactionMonth : null,
+                    IsActive = true
+                };
+
+                await repository.AddAsync(transaction);
+                BudgetTransactions.Add(new BudgetTransactionItemsViewModel(transaction));
+                RefreshFilteredSummaries();
+
+                ClearTransactionForm();
+            }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error adding transaction: {ex.Message}");
@@ -302,11 +342,19 @@ namespace BudgetPlanner.WPF.ViewModels
         {
             try
             {
+
                 if (SelectedTransaction == null) return;
+
+                decimal finalAmount = TransactionAmount;
+
+                if (TransactionCategory?.Name == "Lön" && IsGrossIncome)
+                {
+                    finalAmount = TransactionAmount * (1 - (TaxRate / 100m));
+                }
 
                 var model = SelectedTransaction.Model;
                 model.Date = TransactionDate;
-                model.Amount = TransactionAmount;
+                model.Amount = finalAmount;
                 model.CategoryId = TransactionCategory!.Id;
                 model.Recurrence = TransactionRecurrence;
                 model.Description = TransactionDescription;
@@ -334,7 +382,7 @@ namespace BudgetPlanner.WPF.ViewModels
             TransactionCategory = vm.Category;
             TransactionRecurrence = vm.Recurrence;
             TransactionDescription = vm.Description;
-            TransactionMonth = vm.Month ?? DateTime.Today.Month;
+            TransactionMonth = vm.Month;
 
             RaiseTransactionFormPropertiesChanged();
 
@@ -363,7 +411,7 @@ namespace BudgetPlanner.WPF.ViewModels
             TransactionCategory = null;
             TransactionRecurrence = Recurrence.OneTime;
             TransactionDescription = string.Empty;
-            TransactionMonth = DateTime.Today.Month;
+            TransactionMonth = null;
 
             RaiseTransactionFormPropertiesChanged();
         }
@@ -409,7 +457,20 @@ namespace BudgetPlanner.WPF.ViewModels
         #endregion
 
 
-        public Visibility MonthVisibility => TransactionRecurrence == Recurrence.Yearly ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility MonthVisibility
+        {
+            get
+            {
+                if (TransactionCategory?.Name == "Lön")
+                    return Visibility.Collapsed;
+
+                return TransactionRecurrence == Recurrence.Yearly
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+            }
+        }
+
+
 
         public Recurrence TransactionRecurrence
         {
@@ -424,11 +485,80 @@ namespace BudgetPlanner.WPF.ViewModels
 
                     // Om det inte längre är Yearly, nollställ month
                     if (_transactionRecurrence != Recurrence.Yearly)
-                        TransactionMonth = DateTime.Today.Month;
+                        TransactionMonth = null;
                 }
             }
         }
-        private Recurrence _transactionRecurrence;
+        private Recurrence _transactionRecurrence = Recurrence.OneTime;
+
+
+
+
+        // Skattesats, default 30%
+        private decimal _taxRate = 30;
+        public decimal TaxRate
+        {
+            get => _taxRate;
+            set
+            {
+                if (_taxRate != value)
+                {
+                    _taxRate = value;
+                    RaisePropertyChanged();
+                    RaisePropertyChanged(nameof(MonthlyForecast));
+                    RaisePropertyChanged(nameof(FilteredMonthlyForecast));
+                }
+            }
+        }
+
+        // Hjälpproperty för att visa/aktivera skatteinställningar
+        public bool IsIncomeCategorySelected => TransactionCategory?.Name == "Lön";
+
+        public decimal AnnualIncome =>
+            BudgetTransactions
+                .Where(t => t.Type == TransactionType.Income && t.Category?.Name == "Lön")
+                .Sum(t => t.Recurrence switch
+                {
+                    Recurrence.Monthly => t.Amount * 12,
+                    Recurrence.Yearly => t.Amount,
+                    Recurrence.OneTime => t.Amount,
+                    _ => 0
+                });
+
+
+
+        //private void UpdateTransactionAmountForGross()
+        //{
+        //    if (TransactionCategory?.Name == "Lön")
+        //    {
+        //        // Beräkna beloppet före/efter skatt utan att skriva över användarens inmatning
+        //        RaisePropertyChanged(nameof(TransactionAmount));
+        //        RaisePropertyChanged(nameof(AnnualIncome));
+        //    }
+        //}
+
+        private bool _isGrossIncome = true;
+        public bool IsGrossIncome
+        {
+            get => _isGrossIncome;
+            set
+            {
+                if (_isGrossIncome != value)
+                {
+                    _isGrossIncome = value;
+                    RaisePropertyChanged();
+                    UpdateTransactionAmountForGross(); // triggar UI
+                    RaisePropertyChanged(nameof(MonthlyForecast));
+                    RaisePropertyChanged(nameof(FilteredMonthlyForecast));
+                }
+            }
+        }
+
+
+        public bool ShowIncomeOptions => TransactionCategory?.Type == TransactionType.Income;
+
+
+
 
     }
 }

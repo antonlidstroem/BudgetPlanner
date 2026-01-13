@@ -23,6 +23,9 @@ namespace BudgetPlanner.DAL.Models
         public Recurrence Recurrence { get; set; }
         public bool IsActive { get; set; } = true;
         public int? Month { get; set; }
+        public decimal? TaxRate { get; set; } = 30;
+        public bool? IsGrossIncome { get; set; } = true;
+
 
 
         public TransactionType Type => Category?.Type ?? TransactionType.Expense;
