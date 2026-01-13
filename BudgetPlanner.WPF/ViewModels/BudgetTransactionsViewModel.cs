@@ -15,95 +15,91 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BudgetPlanner.WPF.ViewModels
 {
-
-
     public class BudgetTransactionsViewModel : ViewModelBase
     {
+        #region Fields and Repositories
         private readonly IBudgetTransactionRepository repository;
+
+        private BudgetTransactionItemsViewModel? selectedTransaction;
+        private bool _isInEditMode;
+        private bool _isExitingEditMode = false;
+
+        private int _transactionMonth = DateTime.Today.Month;
+        private bool _showOneTime = true;
+        private bool _showMonthly = true;
+        private bool _showYearly = true;
+        private bool _showIncome = true;
+        private bool _showExpense = true;
+        private Category? _selectedFilterCategory;
+        #endregion
+
+        #region Collections and Views
         public ObservableCollection<BudgetTransactionItemsViewModel> BudgetTransactions { get; set; } = new();
+        public ObservableCollection<Category> Categories { get; set; } = new();
         public ICollectionView TransactionsView { get; }
+        public List<int> Months { get; } = Enumerable.Range(1, 12).ToList();
+        #endregion
 
-        // Ny transaktion
-        public DateTime NewTransactionDate { get; set; } = DateTime.Today;
-        public decimal NewTransactionAmount { get; set; }
-        public Category? NewTransactionCategory { get; set; }
-        public Recurrence NewTransactionRecurrence { get; set; } = Recurrence.OneTime;
-        public string NewTransactionDescription { get; set; } = string.Empty;
+        #region Commands
+        public DelegateCommand AddCommand { get; }
+        public DelegateCommand DeleteCommand { get; }
+        public DelegateCommand ClearCategoryFilterCommand { get; }
+        public DelegateCommand UpdateCommand { get; }
+        public DelegateCommand CancelEditCommand { get; }
+        #endregion
 
+        #region New Transaction Properties
+        public DateTime TransactionDate { get; set; } = DateTime.Today;
+        public decimal TransactionAmount { get; set; }
+        public Category? TransactionCategory { get; set; }
+        public Recurrence TransactionRecurrence { get; set; } = Recurrence.OneTime;
 
-        // Ny transaktionsmånad 
-        private int _newTransactionMonth = DateTime.Today.Month;
-        public int NewTransactionMonth
+        public string TransactionDescription { get; set; } = string.Empty;
+        public int TransactionMonth
         {
-            get => _newTransactionMonth;
+            get => _transactionMonth;
             set
             {
-                if (_newTransactionMonth != value)
+                if (_transactionMonth != value)
                 {
-                    _newTransactionMonth = value;
-                    RaisePropertyChanged();
+                    _transactionMonth = value;
+                    base.RaisePropertyChanged();
                 }
             }
         }
+        #endregion
 
-        // Lista med månader för ComboBox
-        public List<int> Months { get; } = Enumerable.Range(1, 12).ToList();
-
-
-
-
-        // Filteregenskaper summeringar
-        private bool _showOneTime = true;
+        #region Filter Properties
         public bool ShowOneTime
         {
             get => _showOneTime;
             set
             {
                 _showOneTime = value;
-                RaisePropertyChanged();
-                RaisePropertyChangedFilteredSummarys();
+                RefreshFilteredSummaries();
             }
         }
 
-        private bool _showMonthly = true;
         public bool ShowMonthly
         {
             get => _showMonthly;
             set
             {
                 _showMonthly = value;
-                RaisePropertyChanged();
-                RaisePropertyChangedFilteredSummarys();
+                RefreshFilteredSummaries();
             }
         }
 
-        private bool _showYearly = true;
         public bool ShowYearly
         {
             get => _showYearly;
             set
             {
                 _showYearly = value;
-                RaisePropertyChanged();
-                RaisePropertyChangedFilteredSummarys();
+                RefreshFilteredSummaries();
             }
         }
 
-        //Filteregenskaper kategorier
-        private Category? _selectedFilterCategory;
-        public Category? SelectedFilterCategory
-        {
-            get => _selectedFilterCategory;
-            set
-            {
-                _selectedFilterCategory = value;
-                RaisePropertyChanged();
-                RaisePropertyChangedFilteredSummarys();
-            }
-        }
-
-        //Filteregenskaper utgifter inkomster
-        private bool _showIncome = true;
         public bool ShowIncome
         {
             get => _showIncome;
@@ -112,34 +108,12 @@ namespace BudgetPlanner.WPF.ViewModels
                 if (_showIncome != value)
                 {
                     _showIncome = value;
-                    RaisePropertyChanged();
                     TransactionsView.Refresh();
+                    RaisePropertyChanged(nameof(ShowIncome));
                 }
             }
         }
 
-
-        // Editerings mode
-        private bool _isEditing;
-        public bool IsEditing
-        {
-            get => _isEditing;
-            set
-            {
-                if (_isEditing != value)
-                {
-                    _isEditing = value;
-                    RaisePropertyChanged();
-                    UpdateCommand.RaiseCanExecuteChanged();
-                    CancelEditCommand.RaiseCanExecuteChanged();
-                    AddCommand.RaiseCanExecuteChanged();
-
-                }
-            }
-        }
-
-
-        private bool _showExpense = true;
         public bool ShowExpense
         {
             get => _showExpense;
@@ -148,30 +122,45 @@ namespace BudgetPlanner.WPF.ViewModels
                 if (_showExpense != value)
                 {
                     _showExpense = value;
-                    RaisePropertyChanged();
                     TransactionsView.Refresh();
+                    RaisePropertyChanged(nameof(ShowExpense));
                 }
             }
         }
 
-
-        private void RaisePropertyChangedFilteredSummarys()
+        public Category? SelectedFilterCategory
         {
-            TransactionsView.Refresh();
-            RaisePropertyChanged(nameof(FilteredTotalIncome));
-            RaisePropertyChanged(nameof(FilteredTotalExpense));
-            RaisePropertyChanged(nameof(FilteredTotalResult));
-            RaisePropertyChanged(nameof(FilteredMonthlyForecast));
+            get => _selectedFilterCategory;
+            set
+            {
+                _selectedFilterCategory = value;
+                RefreshFilteredSummaries();
+            }
         }
+        #endregion
 
-        // Kategorier
-        public ObservableCollection<Category> Categories { get; set; } = new();
+        #region Edit Mode Property
+        public bool IsInEditMode
+        {
+            get => _isInEditMode;
+            set
+            {
+                if (_isInEditMode != value)
+                {
+                    _isInEditMode = value;
+                    base.RaisePropertyChanged();
+                    UpdateCommand.RaiseCanExecuteChanged();
+                    CancelEditCommand.RaiseCanExecuteChanged();
+                    AddCommand.RaiseCanExecuteChanged();          
+                }
+            }
+        }
+        #endregion
 
-        // Vald transaktion
-        private BudgetTransactionItemsViewModel? selectedTransaction;
+        #region Selected Transaction
         public BudgetTransactionItemsViewModel? SelectedTransaction
         {
-            get { return selectedTransaction; }
+            get => selectedTransaction;
             set
             {
                 if (selectedTransaction == value) return;
@@ -181,33 +170,17 @@ namespace BudgetPlanner.WPF.ViewModels
                 DeleteCommand.RaiseCanExecuteChanged();
 
                 if (value != null)
-                {
                     EnterEditMode(value);
-                }
                 else
                     ExitEditMode();
             }
         }
+        #endregion
 
-        public DelegateCommand AddCommand { get; }
-        public DelegateCommand DeleteCommand { get; }
-        public DelegateCommand ClearCategoryFilterCommand { get; }
-        public DelegateCommand UpdateCommand { get; }
-        public DelegateCommand CancelEditCommand { get; }
-
-
-
-        // Summeringar
-        public decimal TotalIncome =>
-         BudgetTransactions.Where(t => t.Type == TransactionType.Income)
-                           .Sum(t => t.Amount);
-
-        public decimal TotalExpense =>
-            BudgetTransactions.Where(t => t.Type == TransactionType.Expense)
-                              .Sum(t => t.Amount);
-
+        #region Computed Summaries
+        public decimal TotalIncome => BudgetTransactions.Where(t => t.Type == TransactionType.Income).Sum(t => t.Amount);
+        public decimal TotalExpense => BudgetTransactions.Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount);
         public decimal TotalResult => TotalIncome - TotalExpense;
-
         public decimal MonthlyForecast => BudgetTransactions
             .Where(t => t.IsActive)
             .Sum(t => t.Recurrence switch
@@ -217,21 +190,30 @@ namespace BudgetPlanner.WPF.ViewModels
                 _ => 0
             });
 
+        public decimal FilteredTotalIncome => TransactionsView.Cast<BudgetTransactionItemsViewModel>().Where(t => t.Type == TransactionType.Income).Sum(t => t.Amount);
+        public decimal FilteredTotalExpense => TransactionsView.Cast<BudgetTransactionItemsViewModel>().Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount);
+        public decimal FilteredTotalResult => FilteredTotalIncome - FilteredTotalExpense;
+        public decimal FilteredMonthlyForecast => TransactionsView.Cast<BudgetTransactionItemsViewModel>()
+            .Where(t => t.IsActive)
+            .Sum(t => (t.Type == TransactionType.Income ? 1 : -1) * (t.Recurrence switch
+            {
+                Recurrence.Monthly => t.Amount,
+                Recurrence.Yearly => t.Amount / 12,
+                _ => 0
+            }));
+        #endregion
+
+        #region Constructor
         public BudgetTransactionsViewModel()
         {
             var db = new BudgetDbContext();
             repository = new BudgetTransactionRepository(db);
 
-            AddCommand = new DelegateCommand(AddTransaction, _ => !IsEditing);
+            AddCommand = new DelegateCommand(AddTransaction, _ => !IsInEditMode);
             DeleteCommand = new DelegateCommand(DeleteTransaction, CanDelete);
-            UpdateCommand = new DelegateCommand(UpdateTransaction, _ => IsEditing);
-            CancelEditCommand = new DelegateCommand(_ => ExitEditMode(), _ => IsEditing);
-
-
-            ClearCategoryFilterCommand = new DelegateCommand(_ =>
-            {
-                SelectedFilterCategory = null;
-            });
+            UpdateCommand = new DelegateCommand(UpdateTransaction, _ => IsInEditMode);
+            CancelEditCommand = new DelegateCommand(_ => ExitEditMode(), _ => IsInEditMode);
+            ClearCategoryFilterCommand = new DelegateCommand(_ => SelectedFilterCategory = null);
 
             BudgetTransactions.CollectionChanged += (_, __) =>
             {
@@ -244,15 +226,15 @@ namespace BudgetPlanner.WPF.ViewModels
             TransactionsView = CollectionViewSource.GetDefaultView(BudgetTransactions);
             TransactionsView.Filter = FilterTransactions;
         }
+        #endregion
 
+        #region Methods: Load Data
         public async Task LoadCategories()
         {
             Categories.Clear();
             var cats = await repository.GetCategoriesAsync();
             foreach (var cat in cats)
-            {
                 Categories.Add(cat);
-            }
         }
 
         public async Task LoadTransactionsAsync()
@@ -260,61 +242,146 @@ namespace BudgetPlanner.WPF.ViewModels
             BudgetTransactions.Clear();
             var transactions = await repository.GetAllAsync();
             foreach (var t in transactions)
-            {
                 BudgetTransactions.Add(new BudgetTransactionItemsViewModel(t));
-            }
-            RaisePropertyChangedFilteredSummarys();
-        }
 
+            RefreshFilteredSummaries();
+        }
+        #endregion
+
+        #region Methods: Transaction Commands
         private bool CanDelete(object? parameter) => SelectedTransaction != null;
 
         private async void DeleteTransaction(object? parameter)
         {
-            if (SelectedTransaction != null)
+            try
             {
-                await repository.DeleteAsync(SelectedTransaction.Model);
-                BudgetTransactions.Remove(SelectedTransaction);
-                SelectedTransaction = null;
-                RaisePropertyChangedFilteredSummarys();
+                if (SelectedTransaction != null)
+                {
+                    await repository.DeleteAsync(SelectedTransaction.Model);
+                    BudgetTransactions.Remove(SelectedTransaction);
+                    SelectedTransaction = null;
+                    RefreshFilteredSummaries();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting transaction: {ex.Message}");
             }
         }
 
         private async void AddTransaction(object? parameter)
         {
-            if (NewTransactionCategory == null || NewTransactionAmount <= 0) return;
+            try { 
+            if (TransactionCategory == null || TransactionAmount <= 0) return;
 
             var transaction = new BudgetTransaction
             {
-                Date = NewTransactionDate,
-                Amount = NewTransactionAmount,
-                CategoryId = NewTransactionCategory.Id,
-                Recurrence = NewTransactionRecurrence,
-                Description = NewTransactionDescription,
-                Month = NewTransactionRecurrence == Recurrence.Yearly ? NewTransactionMonth : null
+                Date = TransactionDate,
+                Amount = TransactionAmount,
+                CategoryId = TransactionCategory.Id,
+                Recurrence = TransactionRecurrence,
+                Description = TransactionDescription,
+                Month = TransactionRecurrence == Recurrence.Yearly ? TransactionMonth : null
             };
 
             await repository.AddAsync(transaction);
             BudgetTransactions.Add(new BudgetTransactionItemsViewModel(transaction));
-            RaisePropertyChangedFilteredSummarys();
+            RefreshFilteredSummaries();
 
-            // Nollställ formuläret
-            NewTransactionDate = DateTime.Today;
-            NewTransactionAmount = 0;
-            NewTransactionCategory = null;
-            NewTransactionRecurrence = Recurrence.OneTime;
-            NewTransactionDescription = string.Empty;
+            ClearTransactionForm();
+        }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding transaction: {ex.Message}");
+            }
 
-            RaisePropertyChanged(nameof(NewTransactionDate));
-            RaisePropertyChanged(nameof(NewTransactionAmount));
-            RaisePropertyChanged(nameof(NewTransactionCategory));
-            RaisePropertyChanged(nameof(NewTransactionRecurrence));
-            RaisePropertyChanged(nameof(NewTransactionDescription));
         }
 
+        private async void UpdateTransaction(object? parameter)
+        {
+            try
+            {
+                if (SelectedTransaction == null) return;
+
+                var model = SelectedTransaction.Model;
+                model.Date = TransactionDate;
+                model.Amount = TransactionAmount;
+                model.CategoryId = TransactionCategory!.Id;
+                model.Recurrence = TransactionRecurrence;
+                model.Description = TransactionDescription;
+                model.Month = TransactionRecurrence == Recurrence.Yearly ? TransactionMonth : null;
+
+                await repository.UpdateAsync(model);
+                SelectedTransaction.RefreshFromModel();
+
+                ExitEditMode();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating transaction: {ex.Message}");
+            }
+        }
+        #endregion
+
+        #region Methods: Edit Mode
+        private void EnterEditMode(BudgetTransactionItemsViewModel vm)
+        {
+            IsInEditMode = true;
+
+            TransactionDate = vm.Date;
+            TransactionAmount = vm.Amount;
+            TransactionCategory = vm.Category;
+            TransactionRecurrence = vm.Recurrence;
+            TransactionDescription = vm.Description;
+            TransactionMonth = vm.Month ?? DateTime.Today.Month;
+
+            RaiseTransactionFormPropertiesChanged();
+
+        }
+        private void ExitEditMode()
+        {
+            if (_isExitingEditMode) return;
+            _isExitingEditMode = true;
+
+            IsInEditMode = false;
+
+            // Nollställ SelectedTransaction via propertyn
+            if (selectedTransaction != null)
+                SelectedTransaction = null;
+
+            ClearTransactionForm();
+            RefreshFilteredSummaries();
+
+            _isExitingEditMode = false;
+        }
+
+        private void ClearTransactionForm()
+        {
+            TransactionDate = DateTime.Today;
+            TransactionAmount = 0;
+            TransactionCategory = null;
+            TransactionRecurrence = Recurrence.OneTime;
+            TransactionDescription = string.Empty;
+            TransactionMonth = DateTime.Today.Month;
+
+            RaiseTransactionFormPropertiesChanged();
+        }
+
+        private void RaiseTransactionFormPropertiesChanged()
+        {
+            RaisePropertyChanged(nameof(TransactionDate));
+            RaisePropertyChanged(nameof(TransactionAmount));
+            RaisePropertyChanged(nameof(TransactionCategory));
+            RaisePropertyChanged(nameof(TransactionRecurrence));
+            RaisePropertyChanged(nameof(TransactionDescription));
+            RaisePropertyChanged(nameof(TransactionMonth));
+        }
+        #endregion
+
+        #region Methods: Filter & Summaries
         private bool FilterTransactions(object obj)
         {
-            if (obj is not BudgetTransactionItemsViewModel vm)
-                return false;
+            if (obj is not BudgetTransactionItemsViewModel vm) return false;
 
             bool recurrenceMatches =
                 (ShowOneTime && vm.Recurrence == Recurrence.OneTime) ||
@@ -330,109 +397,14 @@ namespace BudgetPlanner.WPF.ViewModels
             return recurrenceMatches && categoryMatches && typeMatches;
         }
 
-        //Summeringar av filtrerade transaktioner
-        public decimal FilteredTotalIncome => TransactionsView.Cast<BudgetTransactionItemsViewModel>()
-            .Where(t => t.Type == TransactionType.Income)
-            .Sum(t => t.Amount);
-
-        public decimal FilteredTotalExpense => TransactionsView.Cast<BudgetTransactionItemsViewModel>()
-            .Where(t => t.Type == TransactionType.Expense)
-            .Sum(t => t.Amount);
-
-        public decimal FilteredTotalResult => FilteredTotalIncome - FilteredTotalExpense;
-
-        public decimal FilteredMonthlyForecast => TransactionsView.Cast<BudgetTransactionItemsViewModel>()
-            .Where(t => t.IsActive)
-            .Sum(t => (t.Type == TransactionType.Income ? 1 : -1) * (t.Recurrence switch
-            {
-                Recurrence.Monthly => t.Amount,
-                Recurrence.Yearly => t.Amount / 12,
-                _ => 0
-       }));
-
-
-        private void EnterEditMode(BudgetTransactionItemsViewModel vm)
+        private void RefreshFilteredSummaries()
         {
-            IsEditing = true;
-
-            NewTransactionDate = vm.Date;
-            NewTransactionAmount = vm.Amount;
-            NewTransactionCategory = vm.Category;
-            NewTransactionRecurrence = vm.Recurrence;
-            NewTransactionDescription = vm.Description;
-            NewTransactionMonth = vm.Month ?? DateTime.Today.Month;
-
-            RaisePropertyChanged(nameof(NewTransactionDate));
-            RaisePropertyChanged(nameof(NewTransactionAmount));
-            RaisePropertyChanged(nameof(NewTransactionCategory));
-            RaisePropertyChanged(nameof(NewTransactionRecurrence));
-            RaisePropertyChanged(nameof(NewTransactionDescription));
-            RaisePropertyChanged(nameof(NewTransactionMonth));
+            TransactionsView.Refresh();
+            RaisePropertyChanged(nameof(FilteredTotalIncome));
+            RaisePropertyChanged(nameof(FilteredTotalExpense));
+            RaisePropertyChanged(nameof(FilteredTotalResult));
+            RaisePropertyChanged(nameof(FilteredMonthlyForecast));
         }
-
-        private async void UpdateTransaction(object? parameter)
-        {
-            if (SelectedTransaction == null) return;
-
-            var model = SelectedTransaction.Model;
-
-            model.Date = NewTransactionDate;
-            model.Amount = NewTransactionAmount;
-            model.CategoryId = NewTransactionCategory!.Id;
-            model.Recurrence = NewTransactionRecurrence;
-            model.Description = NewTransactionDescription;
-            model.Month = NewTransactionRecurrence == Recurrence.Yearly
-                ? NewTransactionMonth
-                : null;
-
-            await repository.UpdateAsync(model);
-
-            // Uppdatera VM
-            SelectedTransaction.RefreshFromModel();
-
-            ExitEditMode();
-        }
-
-
-        private bool _isExitingEditMode = false;
-        private void ExitEditMode()
-        {
-            if (_isExitingEditMode) return; // skydd mot oändlig loop
-            _isExitingEditMode = true;
-
-            IsEditing = false;
-
-            
-            if (SelectedTransaction != null)
-            {
-                selectedTransaction = null; 
-                RaisePropertyChanged(nameof(SelectedTransaction));
-                DeleteCommand.RaiseCanExecuteChanged();
-            }
-
-
-            // Nollställ formuläret
-            NewTransactionDate = DateTime.Today;
-            NewTransactionAmount = 0;
-            NewTransactionCategory = null;
-            NewTransactionRecurrence = Recurrence.OneTime;
-            NewTransactionDescription = string.Empty;
-            NewTransactionMonth = DateTime.Today.Month;
-
-            RaisePropertyChanged(nameof(NewTransactionDate));
-            RaisePropertyChanged(nameof(NewTransactionAmount));
-            RaisePropertyChanged(nameof(NewTransactionCategory));
-            RaisePropertyChanged(nameof(NewTransactionRecurrence));
-            RaisePropertyChanged(nameof(NewTransactionDescription));
-            RaisePropertyChanged(nameof(NewTransactionMonth));
-
-            RaisePropertyChangedFilteredSummarys();
-
-            _isExitingEditMode = false;
-        }
-
-
-
-
+        #endregion
     }
 }

@@ -88,7 +88,7 @@
                     <Style TargetType="TextBlock">
                         <Setter Property="Text" Value="Ny transaktion"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                            <DataTrigger Binding="{Binding IsInEditMode}" Value="True">
                                 <Setter Property="Text" Value="Redigera transaktion"/>
                             </DataTrigger>
                         </Style.Triggers>
@@ -99,24 +99,24 @@
 
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                 <TextBlock Text="Datum:" Width="80"/>
-                <DatePicker SelectedDate="{Binding NewTransactionDate}" Width="150"/>
+                <DatePicker SelectedDate="{Binding TransactionDate}" Width="150"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                 <TextBlock Text="Anteckning:" Width="80"/>
-                <TextBox Text="{Binding NewTransactionDescription}" Width="150"/>
+                <TextBox Text="{Binding TransactionDescription}" Width="150"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                 <TextBlock Text="Belopp:" Width="80"/>
-                <TextBox Text="{Binding NewTransactionAmount}" Width="150"/>
+                <TextBox Text="{Binding TransactionAmount}" Width="150"/>
             </StackPanel>
 
 
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                 <TextBlock Text="Kategori:" Width="80"/>
                 <ComboBox ItemsSource="{Binding Categories}"
-              SelectedItem="{Binding NewTransactionCategory}"
+              SelectedItem="{Binding TransactionCategory}"
               Width="150"
                           ItemTemplate="{StaticResource CategoryComboBoxItemTemplate}"
                           ItemContainerStyle="{StaticResource CategoryComboBoxItemStyle}">
@@ -128,7 +128,7 @@
 
             <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
                 <TextBlock Text="Återkommande:" Width="80"/>
-                <ComboBox SelectedItem="{Binding NewTransactionRecurrence}" Width="150"
+                <ComboBox SelectedItem="{Binding TransactionRecurrence}" Width="150"
                            ItemsSource="{Binding Source={StaticResource RecurrenceValues}}"/>
             </StackPanel>
 
@@ -136,12 +136,12 @@
                 <TextBlock Text="Månad:" Width="80"/>
                 <ComboBox Width="150" 
               ItemsSource="{Binding Months}" 
-              SelectedItem="{Binding NewTransactionMonth}">
+              SelectedItem="{Binding TransactionMonth}">
                     <ComboBox.Style>
                         <Style TargetType="ComboBox">
                             <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding NewTransactionRecurrence}" Value="Yearly">
+                                <DataTrigger Binding="{Binding TransactionRecurrence}" Value="Yearly">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -160,7 +160,7 @@
                         <Style TargetType="Button">
                             <Setter Property="Visibility" Value="Visible"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                <DataTrigger Binding="{Binding IsInEditMode}" Value="True">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -176,7 +176,7 @@
                         <Style TargetType="Button">
                             <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                <DataTrigger Binding="{Binding IsInEditMode}" Value="True">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -191,7 +191,7 @@
                         <Style TargetType="Button">
                             <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                <DataTrigger Binding="{Binding IsInEditMode}" Value="True">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -206,7 +206,7 @@
                         <Style TargetType="Button">
                             <Setter Property="Visibility" Value="Visible"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                <DataTrigger Binding="{Binding IsInEditMode}" Value="True">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                 </DataTrigger>
                             </Style.Triggers>
