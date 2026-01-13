@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using BudgetPlanner.DAL.Data;
 using BudgetPlanner.DAL.Interfaces;
@@ -52,7 +53,7 @@ namespace BudgetPlanner.WPF.ViewModels
         public DateTime TransactionDate { get; set; } = DateTime.Today;
         public decimal TransactionAmount { get; set; }
         public Category? TransactionCategory { get; set; }
-        public Recurrence TransactionRecurrence { get; set; } = Recurrence.OneTime;
+        //public Recurrence TransactionRecurrence { get; set; } = Recurrence.OneTime;
 
         public string TransactionDescription { get; set; } = string.Empty;
         public int TransactionMonth
@@ -406,5 +407,28 @@ namespace BudgetPlanner.WPF.ViewModels
             RaisePropertyChanged(nameof(FilteredMonthlyForecast));
         }
         #endregion
+
+
+        public Visibility MonthVisibility => TransactionRecurrence == Recurrence.Yearly ? Visibility.Visible : Visibility.Collapsed;
+
+        public Recurrence TransactionRecurrence
+        {
+            get => _transactionRecurrence;
+            set
+            {
+                if (_transactionRecurrence != value)
+                {
+                    _transactionRecurrence = value;
+                    RaisePropertyChanged();
+                    RaisePropertyChanged(nameof(MonthVisibility));
+
+                    // Om det inte längre är Yearly, nollställ month
+                    if (_transactionRecurrence != Recurrence.Yearly)
+                        TransactionMonth = DateTime.Today.Month;
+                }
+            }
+        }
+        private Recurrence _transactionRecurrence;
+
     }
 }

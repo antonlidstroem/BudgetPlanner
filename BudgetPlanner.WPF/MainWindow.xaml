@@ -55,6 +55,7 @@
                     <GridViewColumn Header="Kategori" Width="120" DisplayMemberBinding="{Binding Category.Name}" />
                     <GridViewColumn Header="Typ" Width="80" DisplayMemberBinding="{Binding Type}" />
                     <GridViewColumn Header="Återkommande" Width="100" DisplayMemberBinding="{Binding Recurrence}" />
+                    <GridViewColumn Header="Månad" Width="100" DisplayMemberBinding="{Binding Month}" />
                     <GridViewColumn Header="Belopp" Width="80">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -135,8 +136,9 @@
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                 <TextBlock Text="Månad:" Width="80"/>
                 <ComboBox Width="150" 
-              ItemsSource="{Binding Months}" 
-              SelectedItem="{Binding TransactionMonth}">
+                      ItemsSource="{Binding Months}" 
+                      SelectedItem="{Binding TransactionMonth}"
+                          Visibility="{Binding MonthVisibility}">
                     <ComboBox.Style>
                         <Style TargetType="ComboBox">
                             <Setter Property="Visibility" Value="Collapsed"/>
