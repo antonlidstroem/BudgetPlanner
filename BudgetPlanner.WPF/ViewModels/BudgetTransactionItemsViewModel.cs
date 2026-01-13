@@ -53,6 +53,16 @@ namespace BudgetPlanner.WPF.ViewModels
             }
         }
 
+        public int? Month
+        {
+            get { return model.Month; }
+            set
+            {
+                model.Month = value;
+                RaisePropertyChanged();
+            }
+        }
+
         public Category? Category
         {
             get { return model.Category; }
@@ -86,6 +96,15 @@ namespace BudgetPlanner.WPF.ViewModels
         public TransactionType Type
         {
             get { return model.Type; }
+        }
+
+        public void RefreshFromModel()
+        {
+            RaisePropertyChanged(nameof(Date));
+            RaisePropertyChanged(nameof(Amount));
+            RaisePropertyChanged(nameof(Category));
+            RaisePropertyChanged(nameof(Recurrence));
+            RaisePropertyChanged(nameof(Description));
         }
     }
 }

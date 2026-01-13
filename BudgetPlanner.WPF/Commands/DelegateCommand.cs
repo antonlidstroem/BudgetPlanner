@@ -1,7 +1,7 @@
 ﻿
 using System.Windows.Input;
 
-namespace BudgetPlanner.WPF.Command
+namespace BudgetPlanner.WPF.Commands
 {
     public class DelegateCommand : ICommand
     {
