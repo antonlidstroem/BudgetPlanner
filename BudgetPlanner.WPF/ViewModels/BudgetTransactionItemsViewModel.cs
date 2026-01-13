@@ -23,7 +23,8 @@ namespace BudgetPlanner.WPF.ViewModels
                 RaisePropertyChanged();
             } 
         }
-        public Decimal Amount
+       
+        public decimal Amount 
         {
             get { return model.Amount; }
             set
@@ -32,6 +33,17 @@ namespace BudgetPlanner.WPF.ViewModels
                 RaisePropertyChanged();
             }
         }
+
+        public decimal GrossAmount
+        {
+            get => model.GrossAmount;
+            set
+            {
+                model.GrossAmount = value;
+                RaisePropertyChanged();
+            }
+        }
+
 
         public string? Description
         {
