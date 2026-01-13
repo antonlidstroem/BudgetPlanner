@@ -174,8 +174,10 @@ namespace BudgetPlanner.WPF.ViewModels
             get { return selectedTransaction; }
             set
             {
+                if (selectedTransaction == value) return;
+
                 selectedTransaction = value;
-                RaisePropertyChanged();
+                RaisePropertyChanged(nameof(SelectedTransaction));
                 DeleteCommand.RaiseCanExecuteChanged();
 
                 if (value != null)
@@ -223,11 +225,8 @@ namespace BudgetPlanner.WPF.ViewModels
             AddCommand = new DelegateCommand(AddTransaction, _ => !IsEditing);
             DeleteCommand = new DelegateCommand(DeleteTransaction, CanDelete);
             UpdateCommand = new DelegateCommand(UpdateTransaction, _ => IsEditing);
-            CancelEditCommand = new DelegateCommand(_ =>
-            {
-                selectedTransaction = null; 
-                ExitEditMode();
-            }, _ => IsEditing);
+            CancelEditCommand = new DelegateCommand(_ => ExitEditMode(), _ => IsEditing);
+
 
             ClearCategoryFilterCommand = new DelegateCommand(_ =>
             {
@@ -394,12 +393,25 @@ namespace BudgetPlanner.WPF.ViewModels
             ExitEditMode();
         }
 
-        
 
+        private bool _isExitingEditMode = false;
         private void ExitEditMode()
         {
+            if (_isExitingEditMode) return; // skydd mot oändlig loop
+            _isExitingEditMode = true;
+
             IsEditing = false;
 
+            
+            if (SelectedTransaction != null)
+            {
+                selectedTransaction = null; 
+                RaisePropertyChanged(nameof(SelectedTransaction));
+                DeleteCommand.RaiseCanExecuteChanged();
+            }
+
+
+            // Nollställ formuläret
             NewTransactionDate = DateTime.Today;
             NewTransactionAmount = 0;
             NewTransactionCategory = null;
@@ -412,12 +424,14 @@ namespace BudgetPlanner.WPF.ViewModels
             RaisePropertyChanged(nameof(NewTransactionCategory));
             RaisePropertyChanged(nameof(NewTransactionRecurrence));
             RaisePropertyChanged(nameof(NewTransactionDescription));
+            RaisePropertyChanged(nameof(NewTransactionMonth));
 
             RaisePropertyChangedFilteredSummarys();
-            RaisePropertyChanged(nameof(NewTransactionMonth));
+
+            _isExitingEditMode = false;
         }
 
-        
+
 
 
     }
