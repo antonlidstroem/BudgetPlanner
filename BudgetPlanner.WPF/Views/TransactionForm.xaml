@@ -4,9 +4,14 @@
              xmlns:conv="clr-namespace:BudgetPlanner.WPF.Converters"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+
+
              mc:Ignorable="d">
     <Grid Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -55,12 +60,29 @@
         <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding Filter.FilterByRecurrence}"/>
 
         <!-- Knappar -->
-        <StackPanel Grid.Row="6" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,10,0,0">
+        <StackPanel Grid.Row="10" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,10,0,0">
             <Button Content="Lägg till" Command="{Binding AddCommand}" Style="{StaticResource EditModeButtonStyle}" Width="80"/>
             <Button Content="Uppdatera" Command="{Binding UpdateCommand}" Style="{StaticResource EditModeVisibleButtonStyle}" Width="80"/>
             <Button Content="Avbryt" Command="{Binding CancelEditCommand}" Style="{StaticResource EditModeVisibleButtonStyle}" Width="80"/>
             <Button Content="Ta bort" Command="{Binding DeleteCommand}" Width="80"
                     IsEnabled="{Binding Selected, Converter={StaticResource NullToBoolConverter}}"/>
         </StackPanel>
+
+
+            <!-- Brutto / Netto (endast Lön) -->
+            <CheckBox Grid.Row="7" Grid.Column="1"
+          Content="Beloppet är brutto"
+          IsChecked="{Binding Form.IsGrossIncome}"
+          Visibility="{Binding Form.ShowIncomeOptions, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+            <!-- Skattesats -->
+            <TextBlock Grid.Row="8" Grid.Column="0"
+           Text="Skatt %:"
+           Visibility="{Binding Form.ShowIncomeOptions, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+            <TextBox Grid.Row="8" Grid.Column="1"
+         Text="{Binding Form.TaxRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+         Visibility="{Binding Form.ShowIncomeOptions, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
     </Grid>
 </UserControl>

@@ -108,10 +108,13 @@ namespace BudgetPlanner.WPF.ViewModels
 
         private async void AddTransaction(object? _)
         {
-            var net = Form.TransactionAmount;
+            //var net = Form.TransactionAmount;
 
-            if (Form.TransactionCategory?.Name == "Lön" && Form.IsGrossIncome)
-                net *= (1 - Form.TaxRate / 100m);
+            //if (Form.TransactionCategory?.Name == "Lön" && Form.IsGrossIncome)
+            //    net *= (1 - Form.TaxRate / 100m);
+
+            var net = Form.EffectiveNetAmount;
+
 
             var model = new BudgetTransaction
             {
@@ -134,9 +137,11 @@ namespace BudgetPlanner.WPF.ViewModels
         {
             if (Selected == null) return;
 
-            var net = Form.TransactionAmount;
-            if (Form.TransactionCategory?.Name == "Lön" && Form.IsGrossIncome)
-                net *= (1 - Form.TaxRate / 100m);
+            //var net = Form.TransactionAmount;
+            //if (Form.TransactionCategory?.Name == "Lön" && Form.IsGrossIncome)
+            //    net *= (1 - Form.TaxRate / 100m);
+            var net = Form.EffectiveNetAmount;
+
 
             // Uppdatera modellen med alla fält
             Selected.Model.Date = Form.TransactionDate;
@@ -192,7 +197,12 @@ namespace BudgetPlanner.WPF.ViewModels
                 IsInEditMode = true;
 
                 Form.TransactionDate = value.Date;
-                Form.TransactionAmount = value.Amount;
+                Form.TransactionAmount = value.GrossAmount > 0
+                ? value.GrossAmount
+                : value.Amount;
+
+                Form.IsGrossIncome = value.IsGrossIncome ?? false;
+
                 Form.TransactionDescription = value.Description;
                 Form.TransactionCategory = value.Category;
                 Form.TransactionRecurrence = value.Recurrence;

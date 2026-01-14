@@ -65,10 +65,46 @@ namespace BudgetPlanner.WPF.ViewModels.Forms
         }
 
         // BRUTTOINKOMST
-        public bool IsGrossIncome { get; set; }
+        private bool _isGrossIncome;
+        public bool IsGrossIncome
+        {
+            get => _isGrossIncome;
+            set
+            {
+                _isGrossIncome = value;
+                RaisePropertyChanged();
+                RaisePropertyChanged(nameof(EffectiveNetAmount));
+            }
+        }
+
 
         // SKATTESATS
-        public decimal TaxRate { get; set; } = 30;
+        private decimal _taxRate = 30;
+        public decimal TaxRate
+        {
+            get => _taxRate;
+            set
+            {
+                _taxRate = value;
+                RaisePropertyChanged();
+                RaisePropertyChanged(nameof(EffectiveNetAmount));
+            }
+        }
+
+        public decimal EffectiveNetAmount
+        {
+            get
+            {
+                if (TransactionCategory?.Name != "Lön")
+                    return TransactionAmount;
+
+                if (!IsGrossIncome)
+                    return TransactionAmount;
+
+                return TransactionAmount * (1 - TaxRate / 100m);
+            }
+        }
+
 
         // ÅRSARBETSTID
         private decimal _annualHours = 1600;
