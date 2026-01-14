@@ -10,7 +10,9 @@ namespace BudgetPlanner.DAL.Interfaces
         Task<List<BudgetTransaction>> GetAllAsync();
         Task AddAsync(BudgetTransaction transaction);
         Task DeleteAsync(BudgetTransaction transaction);
+        Task UpdateAsync(BudgetTransaction transaction);
         Task<List<Category>> GetCategoriesAsync();
+
     }
 
 }

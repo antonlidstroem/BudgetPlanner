@@ -17,28 +17,22 @@ namespace BudgetPlanner.WPF
     /// </summary>
     public partial class MainWindow : Window
     {
-        private BudgetTransactionsViewModel viewModel;
+        private TransactionsViewModel viewModel;
 
         public MainWindow()
         {
             InitializeComponent();
-            viewModel = new BudgetTransactionsViewModel();
+            viewModel = new TransactionsViewModel();
             DataContext = viewModel;
-            Loaded += TransactionsView_Loaded;
+            //Loaded += TransactionsView_Loaded;
         }
 
-        private async void TransactionsView_Loaded(object sender, RoutedEventArgs e)
-        {
-            await viewModel.LoadCategories();
-            await viewModel.LoadTransactionsAsync();
+        //private async void TransactionsView_Loaded(object sender, RoutedEventArgs e)
+        //{
+        //}
 
-        }
-
-        private void AddTransactionButton_Click(object sender, RoutedEventArgs e)
-        {
-
-
-
-        }
+        //private void AddTransactionButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //}
     }
 }

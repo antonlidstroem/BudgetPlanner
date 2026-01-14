@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 using BudgetPlanner.DAL.Models;
+using BudgetPlanner.WPF.ViewModels.Base;
 
-namespace BudgetPlanner.WPF.ViewModels
+namespace BudgetPlanner.WPF.ViewModels.Items
 {
-    public class BudgetTransactionItemsViewModel : ViewModelBase
+    public class TransactionItemViewModel : ViewModelBase
     {
         private readonly BudgetTransaction model;
         public BudgetTransaction Model => model;
 
-        public BudgetTransactionItemsViewModel(BudgetTransaction model)
+        public TransactionItemViewModel(BudgetTransaction model)
         {
             this.model = model;
         }
@@ -23,7 +24,8 @@ namespace BudgetPlanner.WPF.ViewModels
                 RaisePropertyChanged();
             } 
         }
-        public Decimal Amount
+       
+        public decimal Amount 
         {
             get { return model.Amount; }
             set
@@ -32,6 +34,17 @@ namespace BudgetPlanner.WPF.ViewModels
                 RaisePropertyChanged();
             }
         }
+
+        public decimal GrossAmount
+        {
+            get => model.GrossAmount;
+            set
+            {
+                model.GrossAmount = value;
+                RaisePropertyChanged();
+            }
+        }
+
 
         public string? Description
         {
@@ -53,12 +66,44 @@ namespace BudgetPlanner.WPF.ViewModels
             }
         }
 
+        public int? Month
+        {
+            get { return model.Month; }
+            set
+            {
+                model.Month = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public decimal? TaxRate 
+        {
+            get { return model.TaxRate; }
+            set
+            {
+                model.TaxRate = value;
+                RaisePropertyChanged();
+            }
+        }
+
+
+        public bool? IsGrossIncome
+        {     get { return model.IsGrossIncome; }
+            set
+            {
+                model.IsGrossIncome = value;
+                RaisePropertyChanged();
+            }
+        }
+
+
         public Category? Category
         {
             get { return model.Category; }
             set
             {
                 model.Category = value;
+                model.CategoryId = value?.Id ?? 0;
                 RaisePropertyChanged();
             }
         }
@@ -87,5 +132,20 @@ namespace BudgetPlanner.WPF.ViewModels
         {
             get { return model.Type; }
         }
+
+      
+            public void RefreshFromModel()
+        {
+            RaisePropertyChanged(nameof(Date));
+            RaisePropertyChanged(nameof(Amount));
+            RaisePropertyChanged(nameof(GrossAmount));
+            RaisePropertyChanged(nameof(Category));
+            RaisePropertyChanged(nameof(Recurrence));
+            RaisePropertyChanged(nameof(Description));
+            RaisePropertyChanged(nameof(Month));
+            RaisePropertyChanged(nameof(Type)); 
+        }
+
     }
 }
+

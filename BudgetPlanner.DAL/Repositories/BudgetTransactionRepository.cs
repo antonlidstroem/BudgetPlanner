@@ -39,6 +39,11 @@ namespace BudgetPlanner.DAL.Repositories
         {
             return await context.Categories.ToListAsync();
         }
+        public async Task UpdateAsync(BudgetTransaction transaction)
+        {
+            context.Transactions.Update(transaction);
+            await context.SaveChangesAsync();
+        }
 
     }
 

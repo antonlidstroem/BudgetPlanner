@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace BudgetPlanner.WPF.ViewModels
+namespace BudgetPlanner.WPF.ViewModels.Base
 {
     public class ViewModelBase : INotifyPropertyChanged
     {
