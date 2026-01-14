@@ -5,14 +5,9 @@
              xmlns:conv="clr-namespace:BudgetPlanner.WPF.Converters"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-
-        <!--<ResourceDictionary x:Key="Mitt">
-            <ResourceDictionary.MergedDictionaries>
-                <
-                
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>-->
-
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <conv:NullToBoolConverter x:Key="NullToBoolConverter"/>
+        <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
 
         <!-- Återanvändbar stil för kategoricomboBox -->
         <Style x:Key="CategoryComboBoxItemStyle" TargetType="ComboBoxItem">
@@ -31,21 +26,32 @@
         <DataTemplate x:Key="CategoryComboBoxItemTemplate">
             <TextBlock Text="{Binding Name}" />
         </DataTemplate>
+
+
+<!--Knappar-->
+        <Style x:Key="EditModeButtonStyle" TargetType="Button">
+            <Setter Property="Visibility" Value="Visible"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsInEditMode}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="EditModeVisibleButtonStyle" TargetType="Button">
+            <Setter Property="Visibility" Value="Collapsed"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsInEditMode}" Value="True">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
         
-        
+        <!--Formulär-->
         
 
 
-
-        <SolidColorBrush Color="Red" x:Key="BackgroundBrush"/>
-        <SolidColorBrush Color="Green" x:Key="TextBackgroundBrush"/>
-        <SolidColorBrush Color="Blue" x:Key="ButtonBackgroundBrush"/>
-        
-        
-
-        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-        <conv:NullToBoolConverter x:Key="NullToBoolConverter"/>
-        <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
 
 
     </Application.Resources>
