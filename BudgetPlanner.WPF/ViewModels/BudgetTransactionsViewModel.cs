@@ -80,13 +80,12 @@ namespace BudgetPlanner.WPF.ViewModels
                 RaisePropertyChanged(nameof(FilteredMonthlyForecast));
             });
 
+            // Lyssnar på ändringar i formuläret för att uppdatera filter
+            Filter.PropertyChanged += Filter_PropertyChanged;
+
+            Form.PropertyChanged += Form_PropertyChanged;
 
 
-            Filter.PropertyChanged += (_, __) =>
-            {
-                TransactionsView.Refresh();
-                Summaries.RaiseAll();
-            };
 
             _ = LoadAsync();
         }
@@ -180,6 +179,50 @@ namespace BudgetPlanner.WPF.ViewModels
                 Form.TransactionMonth = value.Month;
             }
         }
+
+        private void ApplyFormFilters()
+        {
+            // Temporärt koppla bort PropertyChanged för att undvika loop
+            Filter.PropertyChanged -= Filter_PropertyChanged;
+
+            Filter.FilterDate = Filter.FilterByDate ? Form.TransactionDate : null;
+            Filter.FilterDescription = Filter.FilterByDescription ? Form.TransactionDescription : string.Empty;
+            Filter.FilterAmount = Filter.FilterByAmount ? Form.TransactionAmount : null;
+            Filter.FilterCategory = Filter.FilterByCategory ? Form.TransactionCategory : null;
+            Filter.FilterRecurrence = Filter.FilterByRecurrence ? Form.TransactionRecurrence : null;
+
+            TransactionsView.Refresh();
+            Summaries.RaiseAll();
+            RaisePropertyChanged(nameof(FilteredTotalIncome));
+            RaisePropertyChanged(nameof(FilteredTotalExpense));
+            RaisePropertyChanged(nameof(FilteredTotalResult));
+            RaisePropertyChanged(nameof(FilteredMonthlyForecast));
+
+            // Koppla tillbaka PropertyChanged
+            Filter.PropertyChanged += Filter_PropertyChanged;
+        }
+
+        private void Filter_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.StartsWith("FilterBy") || e.PropertyName.StartsWith("Filter"))
+                ApplyFormFilters();
+        }
+
+        private void Form_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            // Kolla om ändringen motsvarar ett filter som är aktivt
+            if ((e.PropertyName == nameof(Form.TransactionDate) && Filter.FilterByDate) ||
+                (e.PropertyName == nameof(Form.TransactionDescription) && Filter.FilterByDescription) ||
+                (e.PropertyName == nameof(Form.TransactionAmount) && Filter.FilterByAmount) ||
+                (e.PropertyName == nameof(Form.TransactionCategory) && Filter.FilterByCategory) ||
+                (e.PropertyName == nameof(Form.TransactionRecurrence) && Filter.FilterByRecurrence))
+            {
+                ApplyFormFilters();
+            }
+        }
+
+
+
 
     }
 
