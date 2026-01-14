@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 using BudgetPlanner.DAL.Models;
+using BudgetPlanner.WPF.ViewModels.Base;
 
-namespace BudgetPlanner.WPF.ViewModels
+namespace BudgetPlanner.WPF.ViewModels.Items
 {
-    public class BudgetTransactionItemsViewModel : ViewModelBase
+    public class BudgetTransactionItemViewModel : ViewModelBase
     {
         private readonly BudgetTransaction model;
         public BudgetTransaction Model => model;
 
-        public BudgetTransactionItemsViewModel(BudgetTransaction model)
+        public BudgetTransactionItemViewModel(BudgetTransaction model)
         {
             this.model = model;
         }
