@@ -127,18 +127,30 @@ namespace BudgetPlanner.WPF.ViewModels
 
         private async void UpdateTransaction(object? _)
         {
-            var net = Form.TransactionAmount;
+            if (Selected == null) return;
 
+            var net = Form.TransactionAmount;
             if (Form.TransactionCategory?.Name == "Lön" && Form.IsGrossIncome)
                 net *= (1 - Form.TaxRate / 100m);
 
+            // Uppdatera modellen med alla fält
+            Selected.Model.Date = Form.TransactionDate;
             Selected.Model.Amount = net;
             Selected.Model.GrossAmount = Form.TransactionAmount;
+            Selected.Model.Description = Form.TransactionDescription;
+            Selected.Model.Category = Form.TransactionCategory;
+            Selected.Model.CategoryId = Form.TransactionCategory?.Id ?? 0;
+            Selected.Model.Recurrence = Form.TransactionRecurrence;
+            Selected.Model.Month = Form.TransactionRecurrence == Recurrence.Yearly ? Form.TransactionMonth : null;
+            Selected.Model.IsGrossIncome = Form.IsGrossIncome;
 
+            // Spara till databasen
             await repository.UpdateAsync(Selected.Model);
-            Selected.RefreshFromModel();
 
+            // Uppdatera listan
+            Selected.RefreshFromModel();
         }
+
 
         private async void DeleteTransaction(object? _)
         {
@@ -161,6 +173,9 @@ namespace BudgetPlanner.WPF.ViewModels
             {
                 _selected = value;
                 RaisePropertyChanged();
+
+                UpdateCommand.RaiseCanExecuteChanged();
+                DeleteCommand.RaiseCanExecuteChanged();
 
                 if (value == null)
                 {

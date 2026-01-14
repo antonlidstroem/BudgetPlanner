@@ -103,6 +103,7 @@ namespace BudgetPlanner.WPF.ViewModels.Items
             set
             {
                 model.Category = value;
+                model.CategoryId = value?.Id ?? 0;
                 RaisePropertyChanged();
             }
         }
@@ -132,13 +133,19 @@ namespace BudgetPlanner.WPF.ViewModels.Items
             get { return model.Type; }
         }
 
-        public void RefreshFromModel()
+      
+            public void RefreshFromModel()
         {
             RaisePropertyChanged(nameof(Date));
             RaisePropertyChanged(nameof(Amount));
+            RaisePropertyChanged(nameof(GrossAmount));
             RaisePropertyChanged(nameof(Category));
             RaisePropertyChanged(nameof(Recurrence));
             RaisePropertyChanged(nameof(Description));
+            RaisePropertyChanged(nameof(Month));
+            RaisePropertyChanged(nameof(Type)); 
         }
+
     }
 }
+

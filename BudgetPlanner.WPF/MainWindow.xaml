@@ -22,17 +22,6 @@
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Background" Value="#FFEEE8AA"/>
         </Style>
-
-        <!-- Enum till ComboBox -->
-        <!--<ObjectDataProvider x:Key="RecurrenceValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="models:Recurrence"/>
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>-->
-
-
-
-
     </Window.Resources>
 
     <Grid Margin="10">
@@ -104,19 +93,19 @@
 
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                     <TextBlock Text="Datum:" Width="80"/>
-                    <DatePicker SelectedDate="{Binding Form.TransactionDate}" Width="150"/>
+                    <DatePicker SelectedDate="{Binding Form.TransactionDate, Mode=TwoWay}" Width="150"/>
                     <CheckBox IsChecked="{Binding Filter.FilterByDate}" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                     <TextBlock Text="Anteckning:" Width="80"/>
-                    <TextBox Text="{Binding Form.TransactionDescription}" Width="150"/>
+                    <TextBox Text="{Binding Form.TransactionDescription, Mode=TwoWay}" Width="150"/>
                     <CheckBox IsChecked="{Binding Filter.FilterByDescription}" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                     <TextBlock Text="Belopp:" Width="80"/>
-                    <TextBox Text="{Binding Form.TransactionAmount}" Width="150"/>
+                    <TextBox Text="{Binding Form.TransactionAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" Width="150"/>
                     <CheckBox IsChecked="{Binding Filter.FilterByAmount}" />
                 </StackPanel>
 
@@ -124,7 +113,8 @@
                     <TextBlock Text="Kategori:" Width="80"/>
                     <ComboBox 
                         ItemsSource="{Binding Categories}" 
-                        SelectedItem="{Binding Form.TransactionCategory}" 
+                        SelectedItem="{Binding Form.TransactionCategory, Mode=TwoWay}"
+                        SelectedValuePath="Id"
                         ItemTemplate="{StaticResource CategoryComboBoxItemTemplate}"
                         ItemContainerStyle="{StaticResource CategoryComboBoxItemStyle}"
                         Width="150"/>
@@ -165,7 +155,7 @@
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,5"
                     Visibility="{Binding Form.IsIncomeCategorySelected, Converter={StaticResource BoolToVisibilityConverter}}">
                     <TextBlock Text="Skattesats (%)" Width="80"/>
-                    <TextBox Text="{Binding Form.TaxRate}" Width="150"/>
+                    <TextBox Text="{Binding Form.TaxRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" Width="150"/>
                 </StackPanel>
 
                 <!-- Knappar -->
@@ -221,35 +211,8 @@
                             Command="{Binding DeleteCommand}"
                             Width="80"
                             IsEnabled="{Binding Selected, Converter={StaticResource NullToBoolConverter}}"/>
-
-
-
                 </StackPanel>
             </StackPanel>
-
-            <!-- Filtrering Summeringar-->
-            <StackPanel Margin="10,20,0,0" HorizontalAlignment="Left">
-                <!--<TextBlock Text="Filter" Width="80" Margin="0,10,0,0"/>
-                <CheckBox Content="OneTime" IsChecked="{Binding Filter.ShowOneTime}" />
-                <CheckBox Content="Monthly" IsChecked="{Binding Filter.ShowMonthly}" />
-                <CheckBox Content="Yearly" IsChecked="{Binding Filter.ShowYearly}"/>
-
-                --><!-- Filter för typ --><!--
-                <CheckBox Content="Inkomster" IsChecked="{Binding Filter.ShowIncome}" />
-                <CheckBox Content="Utgifter" IsChecked="{Binding Filter.ShowExpense}" />-->
-            
-                <!-- Kategorifilter
-                <TextBlock Text="Kategori:" Margin="0,10,0,0"/>
-                <ComboBox ItemsSource="{Binding Categories}"
-          SelectedItem="{Binding Filter.SelectedCategory}"
-          Width="150"
-          ItemTemplate="{StaticResource CategoryComboBoxItemTemplate}"
-          ItemContainerStyle="{StaticResource CategoryComboBoxItemStyle}">
-
-                </ComboBox>
-                <Button Content="Rensa filter" Width="100" Margin="0,5,0,0"
-        Command="{Binding ClearFilterCommand}"/>-->
-            </StackPanel> 
         </StackPanel>
 
         <!-- Summeringar -->
@@ -273,7 +236,7 @@
                 <StackPanel Orientation="Vertical" Margin="0,0,0,5"
                      Visibility="{Binding Form.IsIncomeCategorySelected, Converter={StaticResource BoolToVisibilityConverter}}">
                     <TextBlock Text="Årsarbetstid (timmar):" Width="150"/>
-                    <TextBox Text="{Binding Form.AnnualHours}" Width="80"/>
+                    <TextBox Text="{Binding Form.AnnualHours, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" Width="80"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Vertical" Margin="0,0,0,5"
@@ -291,8 +254,6 @@
             </StackPanel>
 
             <TextBlock Text="{Binding Summaries.TotalIncome, StringFormat=C}" />
-
-
         </StackPanel>
     </Grid>
 </Window>
