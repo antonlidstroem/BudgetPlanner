@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         Title="Budgetplanerare"
         Language="sv-SE"
-        Height="600" 
+        MinHeight="600" 
         MinWidth="750">
 
     <Grid Margin="10">

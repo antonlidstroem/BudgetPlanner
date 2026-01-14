@@ -10,6 +10,8 @@ namespace BudgetPlanner.DAL.Data
 
         public DbSet<BudgetTransaction> Transactions { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Absence> Absences { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
@@ -40,7 +42,9 @@ namespace BudgetPlanner.DAL.Data
                 new Category { Id = 10, Name = "Hobbyverksamhet", Type = TransactionType.Income }
             );
 
-            
+            modelBuilder.Entity<Absence>()
+        .HasKey(a => a.Date);
+
         }
 
     }

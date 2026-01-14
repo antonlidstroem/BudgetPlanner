@@ -45,6 +45,8 @@ namespace BudgetPlanner.WPF.ViewModels
         public MonthSummaryViewModel MonthSummary { get; }
         public MonthlyForecastViewModel MonthlyForecast { get; }
         public YearSummaryViewModel YearSummary { get; }
+        public ObservableCollection<AbsenceItemViewModel> Absences { get; }
+
 
 
 
