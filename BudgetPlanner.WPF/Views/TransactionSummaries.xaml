@@ -19,17 +19,17 @@
             <!-- Vänster kolumn -->
             <StackPanel Grid.Column="0" Margin="5">
                 <TextBlock Text="Totala inkomster:" FontWeight="Bold"/>
-                <TextBlock Text="{Binding FilteredTotalIncome, StringFormat=C}" Foreground="Green"/>
+                <TextBlock Text="{Binding TotalIncome, StringFormat=C}" Foreground="Green"/>
                 <TextBlock Text="Totala utgifter:" FontWeight="Bold"/>
-                <TextBlock Text="{Binding FilteredTotalExpense, StringFormat=C}" Foreground="Red"/>
+                <TextBlock Text="{Binding TotalExpense, StringFormat=C}" Foreground="Red"/>
                 <TextBlock Text="Resultat:" FontWeight="Bold"/>
-                <TextBlock Text="{Binding FilteredTotalResult, StringFormat=C}"/>
+                <TextBlock Text="{Binding Result, StringFormat=C}"/>
             </StackPanel>
 
             <!-- Höger kolumn -->
             <StackPanel Grid.Column="1" Margin="5">
                 <TextBlock Text="Månadsprognos:" FontWeight="Bold"/>
-                <TextBlock Text="{Binding FilteredMonthlyForecast, StringFormat=C}"/>
+                <TextBlock Text="{Binding MonthlyForecast, StringFormat=C}"/>
             </StackPanel>
         </Grid>
     </Border>

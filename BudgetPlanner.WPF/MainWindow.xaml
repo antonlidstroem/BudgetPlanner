@@ -20,20 +20,19 @@
         <!-- Vänstra kolumn: Transaktioner -->
         <views:TransactionListView Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Margin="0,0,10,0"/>
 
-        <!-- Högra kolumn: skapa egen Grid med två rader -->
         <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
-                <!-- Formulär -->
                 <RowDefinition Height="Auto"/>
-                <!-- Summeringar -->
             </Grid.RowDefinitions>
 
             <!-- Formulär -->
             <views:TransactionForm Grid.Row="0" Margin="0,0,0,10"/>
 
             <!-- Summeringar -->
-            <views:TransactionSummaries Grid.Row="1"/>
+            <views:TransactionSummaries Grid.Row="1" DataContext="{Binding Summaries}"/>
+
+
         </Grid>
     </Grid>
 </Window>
