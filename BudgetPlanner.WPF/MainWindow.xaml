@@ -4,126 +4,36 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BudgetPlanner.WPF"
-        xmlns:models="clr-namespace:BudgetPlanner.DAL.Models;assembly=BudgetPlanner.DAL"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        xmlns:conv="clr-namespace:BudgetPlanner.WPF.Converters" 
-        xmlns:forms="clr-namespace:BudgetPlanner.WPF.ViewModels.Forms"
-        xmlns:filters="clr-namespace:BudgetPlanner.WPF.ViewModels.Filters"
         xmlns:views="clr-namespace:BudgetPlanner.WPF.Views"
-
-
         mc:Ignorable="d"
         Title="Budgetplanerare"
         Language="sv-SE"
-        SizeToContent="Width"
         Height="600" 
         MinWidth="750">
-
-    <Window.Resources>
-        <Style TargetType="GridViewColumnHeader">
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Background" Value="#FFEEE8AA"/>
-        </Style>
-    </Window.Resources>
 
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4*"/>
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="150"/>
-        </Grid.RowDefinitions>
 
+        <!-- Vänstra kolumn: Transaktioner -->
+        <views:TransactionListView Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Margin="0,0,10,0"/>
 
-        <!-- ListView med transaktioner -->
-        <ListView ItemsSource="{Binding TransactionsView}"
-                  SelectedItem="{Binding Selected}"
-                  Grid.Column="0" Grid.Row="0" Margin="0,0,10,0"
-                  SelectionMode="Single">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Datum" Width="100" DisplayMemberBinding="{Binding Date, StringFormat=d}" />
-                    <GridViewColumn Header="Anteckning" Width="200" DisplayMemberBinding="{Binding Description}" />
-                    <GridViewColumn Header="Kategori" Width="120" DisplayMemberBinding="{Binding Category.Name}" />
-                    <GridViewColumn Header="Typ" Width="80" DisplayMemberBinding="{Binding Type}" />
-                    <GridViewColumn Header="Återkommande" Width="100" DisplayMemberBinding="{Binding Recurrence}" />
-                    <GridViewColumn Header="Månad" Width="100" DisplayMemberBinding="{Binding Month}" />
-                    <GridViewColumn Header="Belopp" Width="80">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock>
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Text" Value="{Binding Amount, StringFormat=C}"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Type}" Value="Expense">
-                                                    <Setter Property="Text" Value="{Binding Amount, StringFormat=-{0:C}}"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
+        <!-- Högra kolumn: skapa egen Grid med två rader -->
+        <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <!-- Formulär -->
+                <RowDefinition Height="Auto"/>
+                <!-- Summeringar -->
+            </Grid.RowDefinitions>
 
+            <!-- Formulär -->
+            <views:TransactionForm Grid.Row="0" Margin="0,0,0,10"/>
 
-                </GridView>
-            </ListView.View>
-        </ListView>
-
-         <!--Formulär--> 
-        <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Margin="10,0,0,0">
-            <views:TransactionForm DataContext="{Binding}" />
-        </StackPanel>
-
-
-            
- 
-
-
-
-    <!-- Summeringar -->
-        <StackPanel Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,10,0,0">
-
-            <StackPanel Orientation="Vertical" Margin="10,0,0,5">
-                <TextBlock Text="Totala inkomster: " FontWeight="Bold"/>
-                <TextBlock Text="{Binding FilteredTotalIncome, StringFormat=C}" Margin="5,0,20,0"/>
-                <TextBlock Text="Totala utgifter: " FontWeight="Bold"/>
-                <TextBlock Text="{Binding FilteredTotalExpense, StringFormat=C}" Margin="5,0,20,0"/>
-                <TextBlock Text="Resultat: " FontWeight="Bold"/>
-                <TextBlock Text="{Binding FilteredTotalResult, StringFormat=C}" Margin="5,0,20,0"/>
-                <TextBlock Text="Månadsprognos: " FontWeight="Bold"/>
-                <TextBlock Text="{Binding FilteredMonthlyForecast, StringFormat=C}" Margin="5,0,0,0"/>
-
-
-            </StackPanel>
-
-            <StackPanel Orientation="Vertical" Margin="100,0,0,5">
-
-                <StackPanel Orientation="Vertical" Margin="0,0,0,5"
-                     Visibility="{Binding Form.IsIncomeCategorySelected, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <TextBlock Text="Årsarbetstid (timmar):" Width="150"/>
-                    <TextBox Text="{Binding Form.AnnualHours, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" Width="80"/>
-                </StackPanel>
-
-                <StackPanel Orientation="Vertical" Margin="0,0,0,5"
-                      Visibility="{Binding Form.IsIncomeCategorySelected, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <TextBlock Text="Timlön:" Width="150"/>
-                    <TextBlock Text="{Binding Form.HourlyRate, StringFormat=C}" Width="80"/>
-                </StackPanel>
-
-                <StackPanel Orientation="Vertical" Margin="0,0,0,5"
-                      Visibility="{Binding Form.IsIncomeCategorySelected, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <TextBlock Text="Månadslön från timmar:" Width="150"/>
-                    <TextBlock Text="{Binding Form.MonthlyIncomeFromHours, StringFormat=C}" Width="80"/>
-                </StackPanel>
-
-            </StackPanel>
-
-            <TextBlock Text="{Binding Summaries.TotalIncome, StringFormat=C}" />
-        </StackPanel>
+            <!-- Summeringar -->
+            <views:TransactionSummaries Grid.Row="1"/>
+        </Grid>
     </Grid>
 </Window>

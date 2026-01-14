@@ -5,61 +5,62 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d">
-    <StackPanel Margin="10">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="120"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="30"/>
+        </Grid.ColumnDefinitions>
+
         <!-- Rubrik -->
-        <TextBlock FontWeight="Bold"
-                   FontSize="14"
-                   Margin="0,0,0,10"
-                   Text="{Binding FormTitle}" />
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="3" Text="{Binding FormTitle}" FontWeight="Bold" FontSize="14" Margin="0,0,0,10"/>
 
         <!-- Datum -->
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-            <TextBlock Text="Datum:" Width="80"/>
-            <DatePicker SelectedDate="{Binding Form.TransactionDate, Mode=TwoWay}" Width="150"/>
-            <CheckBox IsChecked="{Binding Filter.FilterByDate}" />
-        </StackPanel>
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Datum:" VerticalAlignment="Center"/>
+        <DatePicker Grid.Row="1" Grid.Column="1" SelectedDate="{Binding Form.TransactionDate, Mode=TwoWay}"/>
+        <CheckBox Grid.Row="1" Grid.Column="2" IsChecked="{Binding Filter.FilterByDate}"/>
 
         <!-- Anteckning -->
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-            <TextBlock Text="Anteckning:" Width="80"/>
-            <TextBox Text="{Binding Form.TransactionDescription, Mode=TwoWay}" Width="150"/>
-            <CheckBox IsChecked="{Binding Filter.FilterByDescription}" />
-        </StackPanel>
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Anteckning:" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Form.TransactionDescription, Mode=TwoWay}"/>
+        <CheckBox Grid.Row="2" Grid.Column="2" IsChecked="{Binding Filter.FilterByDescription}"/>
 
         <!-- Belopp -->
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-            <TextBlock Text="Belopp:" Width="80"/>
-            <TextBox Text="{Binding Form.TransactionAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" Width="150"/>
-            <CheckBox IsChecked="{Binding Filter.FilterByAmount}" />
-        </StackPanel>
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Belopp:" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Form.TransactionAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}"/>
+        <CheckBox Grid.Row="3" Grid.Column="2" IsChecked="{Binding Filter.FilterByAmount}"/>
 
         <!-- Kategori -->
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-            <TextBlock Text="Kategori:" Width="80"/>
-            <ComboBox ItemsSource="{Binding Categories}" 
-                      SelectedItem="{Binding Form.TransactionCategory, Mode=TwoWay}"
-                      SelectedValuePath="Id"
-                      ItemTemplate="{StaticResource CategoryComboBoxItemTemplate}"
-                      ItemContainerStyle="{StaticResource CategoryComboBoxItemStyle}"
-                      Width="150"/>
-            <CheckBox IsChecked="{Binding Filter.FilterByCategory}" />
-        </StackPanel>
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Kategori:" VerticalAlignment="Center"/>
+        <ComboBox Grid.Row="4" Grid.Column="1"
+                  ItemsSource="{Binding Categories}" 
+                  SelectedItem="{Binding Form.TransactionCategory, Mode=TwoWay}"
+                  SelectedValuePath="Id"
+                  ItemTemplate="{StaticResource CategoryComboBoxItemTemplate}"
+                  ItemContainerStyle="{StaticResource CategoryComboBoxItemStyle}"/>
+        <CheckBox Grid.Row="4" Grid.Column="2" IsChecked="{Binding Filter.FilterByCategory}"/>
 
         <!-- Återkommande -->
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
-            <TextBlock Text="Återkommande:" Width="80"/>
-            <ComboBox SelectedItem="{Binding Form.TransactionRecurrence}" Width="150"
-                      ItemsSource="{Binding Form.RecurrenceValues}"/>
-            <CheckBox IsChecked="{Binding Filter.FilterByRecurrence}" />
-        </StackPanel>
+        <TextBlock Grid.Row="5" Grid.Column="0" Text="Återkommande:" VerticalAlignment="Center"/>
+        <ComboBox Grid.Row="5" Grid.Column="1" SelectedItem="{Binding Form.TransactionRecurrence}" ItemsSource="{Binding Form.RecurrenceValues}"/>
+        <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding Filter.FilterByRecurrence}"/>
 
         <!-- Knappar -->
-        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-            <Button Content="Lägg till" Command="{Binding AddCommand}" Style="{StaticResource EditModeButtonStyle}" Width="80" Margin="0,0,10,0"/>
-            <Button Content="Uppdatera" Command="{Binding UpdateCommand}" Style="{StaticResource EditModeVisibleButtonStyle}" Width="80" Margin="0,0,10,0"/>
+        <StackPanel Grid.Row="6" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,10,0,0">
+            <Button Content="Lägg till" Command="{Binding AddCommand}" Style="{StaticResource EditModeButtonStyle}" Width="80"/>
+            <Button Content="Uppdatera" Command="{Binding UpdateCommand}" Style="{StaticResource EditModeVisibleButtonStyle}" Width="80"/>
             <Button Content="Avbryt" Command="{Binding CancelEditCommand}" Style="{StaticResource EditModeVisibleButtonStyle}" Width="80"/>
             <Button Content="Ta bort" Command="{Binding DeleteCommand}" Width="80"
                     IsEnabled="{Binding Selected, Converter={StaticResource NullToBoolConverter}}"/>
         </StackPanel>
-    </StackPanel>
+    </Grid>
 </UserControl>
