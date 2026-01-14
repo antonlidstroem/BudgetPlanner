@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BudgetPlanner.DAL.Migrations
 {
     [DbContext(typeof(BudgetDbContext))]
-    [Migration("20260113142140_addCalculations")]
-    partial class addCalculations
+    [Migration("20260114153555_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,28 @@ namespace BudgetPlanner.DAL.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("BudgetPlanner.DAL.Models.Absence", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("Hours")
+                        .HasColumnType("float");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Absences");
+                });
 
             modelBuilder.Entity("BudgetPlanner.DAL.Models.BudgetTransaction", b =>
                 {
@@ -149,6 +171,12 @@ namespace BudgetPlanner.DAL.Migrations
                             Id = 10,
                             Name = "Hobbyverksamhet",
                             Type = 0
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Name = "VAB/Sjukfrånvaro",
+                            Type = 1
                         });
                 });
 

@@ -39,11 +39,10 @@ namespace BudgetPlanner.DAL.Data
                 new Category { Id = 7, Name = "SaaS-produkter", Type = TransactionType.Expense },
                 new Category { Id = 8, Name = "Lön", Type = TransactionType.Income },
                 new Category { Id = 9, Name = "Bidrag", Type = TransactionType.Income },
-                new Category { Id = 10, Name = "Hobbyverksamhet", Type = TransactionType.Income }
+                new Category { Id = 10, Name = "Hobbyverksamhet", Type = TransactionType.Income },
+                new Category { Id = 11, Name = "VAB/Sjukfrånvaro", Type = TransactionType.Expense }
             );
 
-            modelBuilder.Entity<Absence>()
-        .HasKey(a => a.Date);
 
         }
 
