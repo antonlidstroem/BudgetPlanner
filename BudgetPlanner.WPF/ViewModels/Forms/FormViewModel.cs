@@ -7,7 +7,7 @@ using BudgetPlanner.WPF.ViewModels.Base;
 
 namespace BudgetPlanner.WPF.ViewModels.Forms
 {
-    public class TransactionFormViewModel : ViewModelBase
+    public class FormViewModel : ViewModelBase
     {
         public DateTime TransactionDate { get; set; } = DateTime.Today;
         private decimal _transactionAmount;

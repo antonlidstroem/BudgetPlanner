@@ -15,18 +15,19 @@ using BudgetPlanner.WPF.ViewModels.Base;
 using BudgetPlanner.WPF.ViewModels.Filters;
 using BudgetPlanner.WPF.ViewModels.Forms;
 using BudgetPlanner.WPF.ViewModels.Items;
+using BudgetPlanner.WPF.ViewModels.Summaries;
 
 namespace BudgetPlanner.WPF.ViewModels
 {
-    public class BudgetTransactionsViewModel : ViewModelBase
+    public class TransactionsViewModel : ViewModelBase
     {
         private readonly IBudgetTransactionRepository repository;
 
-        public ObservableCollection<BudgetTransactionItemViewModel> Transactions { get; } = new();
+        public ObservableCollection<TransactionItemViewModel> Transactions { get; } = new();
         public ObservableCollection<Category> Categories { get; } = new();
 
-        public TransactionFormViewModel Form { get; } = new();
-        public TransactionFilterViewModel Filter { get; } = new();
+        public FormViewModel Form { get; } = new();
+        public FilterViewModel Filter { get; } = new();
 
         public ICollectionView TransactionsView { get; }
 
@@ -40,20 +41,24 @@ namespace BudgetPlanner.WPF.ViewModels
         public decimal FilteredTotalResult => Filter.Result(Transactions);
         public decimal FilteredMonthlyForecast => Filter.MonthlyForecast(Transactions);
 
-        private BudgetTransactionItemViewModel? _selected;
-        public TransactionSummaryViewModel Summaries { get; }
+        private TransactionItemViewModel? _selected;
+        public MonthSummaryViewModel MonthSummary { get; }
+        public MonthlyForecastViewModel MonthlyForecast { get; }
+        public YearSummaryViewModel YearSummary { get; }
 
 
 
         // KONSTRUKTOR
-        public BudgetTransactionsViewModel()
+        public TransactionsViewModel()
         {
             repository = new BudgetTransactionRepository(new BudgetDbContext());
 
             TransactionsView = CollectionViewSource.GetDefaultView(Transactions);
-            TransactionsView.Filter = o => Filter.Matches((BudgetTransactionItemViewModel)o);
+            TransactionsView.Filter = o => Filter.Matches((TransactionItemViewModel)o);
 
-            Summaries = new TransactionSummaryViewModel(TransactionsView);
+            MonthSummary = new MonthSummaryViewModel(TransactionsView);
+            MonthlyForecast = new MonthlyForecastViewModel();
+            YearSummary = new YearSummaryViewModel(Transactions);
 
             AddCommand = new DelegateCommand(AddTransaction);
             UpdateCommand = new DelegateCommand(UpdateTransaction, _ => Selected != null);
@@ -98,7 +103,7 @@ namespace BudgetPlanner.WPF.ViewModels
 
             var transactions = await repository.GetAllAsync();
             foreach (var t in transactions)
-                Transactions.Add(new BudgetTransactionItemViewModel(t));
+                Transactions.Add(new TransactionItemViewModel(t));
         }
 
         private async void AddTransaction(object? _)
@@ -121,7 +126,7 @@ namespace BudgetPlanner.WPF.ViewModels
             };
 
             await repository.AddAsync(model);
-            Transactions.Add(new BudgetTransactionItemViewModel(model));
+            Transactions.Add(new TransactionItemViewModel(model));
             Form.Clear();
         }
 
@@ -166,7 +171,7 @@ namespace BudgetPlanner.WPF.ViewModels
             set { _isInEditMode = value; RaisePropertyChanged(); }
         }
 
-        public BudgetTransactionItemViewModel? Selected
+        public TransactionItemViewModel? Selected
         {
             get => _selected;
             set
@@ -207,7 +212,10 @@ namespace BudgetPlanner.WPF.ViewModels
             Filter.FilterRecurrence = Filter.FilterByRecurrence ? Form.TransactionRecurrence : null;
 
             TransactionsView.Refresh();
-            Summaries.RaiseAll();
+
+            MonthSummary?.RaiseAll();
+            YearSummary?.RaiseAll();
+
             RaisePropertyChanged(nameof(FilteredTotalIncome));
             RaisePropertyChanged(nameof(FilteredTotalExpense));
             RaisePropertyChanged(nameof(FilteredTotalResult));

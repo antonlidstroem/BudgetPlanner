@@ -17,12 +17,12 @@ namespace BudgetPlanner.WPF
     /// </summary>
     public partial class MainWindow : Window
     {
-        private BudgetTransactionsViewModel viewModel;
+        private TransactionsViewModel viewModel;
 
         public MainWindow()
         {
             InitializeComponent();
-            viewModel = new BudgetTransactionsViewModel();
+            viewModel = new TransactionsViewModel();
             DataContext = viewModel;
             //Loaded += TransactionsView_Loaded;
         }

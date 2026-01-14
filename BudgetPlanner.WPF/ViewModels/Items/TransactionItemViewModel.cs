@@ -6,12 +6,12 @@ using BudgetPlanner.WPF.ViewModels.Base;
 
 namespace BudgetPlanner.WPF.ViewModels.Items
 {
-    public class BudgetTransactionItemViewModel : ViewModelBase
+    public class TransactionItemViewModel : ViewModelBase
     {
         private readonly BudgetTransaction model;
         public BudgetTransaction Model => model;
 
-        public BudgetTransactionItemViewModel(BudgetTransaction model)
+        public TransactionItemViewModel(BudgetTransaction model)
         {
             this.model = model;
         }

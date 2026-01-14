@@ -7,7 +7,7 @@ using BudgetPlanner.WPF.ViewModels.Items;
 
 namespace BudgetPlanner.WPF.ViewModels.Filters
 {
-    public class TransactionFilterViewModel : ViewModelBase
+    public class FilterViewModel : ViewModelBase
     {
         // ====================================
         // Filter-egenskaper för form
@@ -108,7 +108,7 @@ namespace BudgetPlanner.WPF.ViewModels.Filters
         // ====================================
         // Matcher för filter
         // ====================================
-        public bool Matches(BudgetTransactionItemViewModel vm)
+        public bool Matches(TransactionItemViewModel vm)
         {
             bool recurrenceFilter =
                 (!FilterByRecurrence || vm.Recurrence == FilterRecurrence) &&
@@ -131,16 +131,16 @@ namespace BudgetPlanner.WPF.ViewModels.Filters
         // ====================================
         // Summeringar
         // ====================================
-        public decimal TotalIncome(IEnumerable<BudgetTransactionItemViewModel> items) =>
+        public decimal TotalIncome(IEnumerable<TransactionItemViewModel> items) =>
             items.Where(Matches).Where(t => t.Type == TransactionType.Income).Sum(t => t.Amount);
 
-        public decimal TotalExpense(IEnumerable<BudgetTransactionItemViewModel> items) =>
+        public decimal TotalExpense(IEnumerable<TransactionItemViewModel> items) =>
             items.Where(Matches).Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount);
 
-        public decimal Result(IEnumerable<BudgetTransactionItemViewModel> items) =>
+        public decimal Result(IEnumerable<TransactionItemViewModel> items) =>
             TotalIncome(items) - TotalExpense(items);
 
-        public decimal MonthlyForecast(IEnumerable<BudgetTransactionItemViewModel> items) =>
+        public decimal MonthlyForecast(IEnumerable<TransactionItemViewModel> items) =>
             Result(items) / 12m;
     }
 }
