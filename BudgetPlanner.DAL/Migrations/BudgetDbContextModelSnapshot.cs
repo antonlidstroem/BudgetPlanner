@@ -22,6 +22,28 @@ namespace BudgetPlanner.DAL.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("BudgetPlanner.DAL.Models.Absence", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("Hours")
+                        .HasColumnType("float");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Absences");
+                });
+
             modelBuilder.Entity("BudgetPlanner.DAL.Models.BudgetTransaction", b =>
                 {
                     b.Property<int>("Id")
@@ -146,6 +168,12 @@ namespace BudgetPlanner.DAL.Migrations
                             Id = 10,
                             Name = "Hobbyverksamhet",
                             Type = 0
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Name = "VAB/Sjukfrånvaro",
+                            Type = 1
                         });
                 });
 

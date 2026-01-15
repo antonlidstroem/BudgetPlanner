@@ -45,6 +45,8 @@ namespace BudgetPlanner.WPF.ViewModels
         public MonthSummaryViewModel MonthSummary { get; }
         public MonthlyForecastViewModel MonthlyForecast { get; }
         public YearSummaryViewModel YearSummary { get; }
+        public ObservableCollection<AbsenceItemViewModel> Absences { get; }
+
 
 
 
@@ -101,6 +103,7 @@ namespace BudgetPlanner.WPF.ViewModels
             foreach (var c in categories)
                 Categories.Add(c);
 
+
             var transactions = await repository.GetAllAsync();
             foreach (var t in transactions)
                 Transactions.Add(new TransactionItemViewModel(t));
@@ -130,6 +133,25 @@ namespace BudgetPlanner.WPF.ViewModels
 
             await repository.AddAsync(model);
             Transactions.Add(new TransactionItemViewModel(model));
+
+            if (Form.TransactionCategory?.Name == "VAB/Sjukfrånvaro")
+            {
+                var absence = new Absence
+                {
+                    Date = Form.AbsenceDate,
+                    Type = Form.AbsenceType,
+                    Hours = Form.AbsenceHours
+                };
+
+                // Lägg till i MonthlyForecast
+                MonthlyForecast.AddAbsence(absence);
+
+                // Spara i databasen
+                using var db = new BudgetDbContext();
+                db.Absences.Add(absence);
+                await db.SaveChangesAsync();
+            }
+
             Form.Clear();
         }
 
@@ -253,6 +275,12 @@ namespace BudgetPlanner.WPF.ViewModels
                 ApplyFormFilters();
             }
         }
+
+        public ObservableCollection<AbsenceType> AbsenceTypes { get; } = new()
+        {
+            AbsenceType.Sick,
+            AbsenceType.Vab
+        };
 
 
 

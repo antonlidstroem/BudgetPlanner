@@ -35,6 +35,7 @@ namespace BudgetPlanner.WPF.ViewModels.Forms
             set
             {
                 _transactionCategory = value;
+                ShowAbsenceFields = _transactionCategory?.Name == "VAB/Sjukfrånvaro";
                 RaisePropertyChanged();
                 RaisePropertyChanged(nameof(IsIncomeCategorySelected));
                 RaisePropertyChanged(nameof(MonthVisibility));
@@ -166,6 +167,38 @@ namespace BudgetPlanner.WPF.ViewModels.Forms
 
         // MÅNAD
         public IEnumerable<int> Months => Enumerable.Range(1, 12);
+
+
+        // Extra fält för frånvaro
+        private bool _showAbsenceFields;
+        public bool ShowAbsenceFields
+        {
+            get => _showAbsenceFields;
+            set { _showAbsenceFields = value; RaisePropertyChanged(); }
+        }
+
+        private DateTime _absenceDate = DateTime.Today;
+        public DateTime AbsenceDate
+        {
+            get => _absenceDate;
+            set { _absenceDate = value; RaisePropertyChanged(); }
+        }
+
+        private AbsenceType _absenceType = AbsenceType.Sick;
+        public AbsenceType AbsenceType
+        {
+            get => _absenceType;
+            set { _absenceType = value; RaisePropertyChanged(); }
+        }
+
+        private double _absenceHours = 8;
+        public double AbsenceHours
+        {
+            get => _absenceHours;
+            set { _absenceHours = value; RaisePropertyChanged(); }
+        }
+
+
 
     }
 }

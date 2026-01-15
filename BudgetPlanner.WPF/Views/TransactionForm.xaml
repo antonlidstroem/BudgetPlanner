@@ -68,8 +68,7 @@
                     IsEnabled="{Binding Selected, Converter={StaticResource NullToBoolConverter}}"/>
         </StackPanel>
 
-
-            <!-- Brutto / Netto (endast Lön) -->
+        <!-- Brutto / Netto (endast Lön) -->
             <CheckBox Grid.Row="7" Grid.Column="1"
           Content="Beloppet är brutto"
           IsChecked="{Binding Form.IsGrossIncome}"
@@ -83,6 +82,21 @@
             <TextBox Grid.Row="8" Grid.Column="1"
          Text="{Binding Form.TaxRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
          Visibility="{Binding Form.ShowIncomeOptions, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+        <!--Absence-->
+        <StackPanel Grid.Row="6" Grid.ColumnSpan="2" Visibility="{Binding ShowAbsenceFields, Converter={StaticResource BoolToVisibilityConverter}}" Margin="0,10,0,0">
+            <TextBlock Text="Frånvarodatum:"/>
+            <DatePicker SelectedDate="{Binding AbsenceDate}"/>
+
+            <TextBlock Text="Typ:"/>
+            <ComboBox SelectedItem="{Binding AbsenceType}" ItemsSource="{Binding AbsenceTypes}"/>
+
+            <TextBlock Text="Timmar:"/>
+            <TextBox Text="{Binding AbsenceHours}"/>
+        </StackPanel>
+
+
+
 
     </Grid>
 </UserControl>

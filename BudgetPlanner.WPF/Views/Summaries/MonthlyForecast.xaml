@@ -3,13 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:BudgetPlanner.WPF.Views.Summaries"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <Border Padding="10" Margin="10" CornerRadius="6" Background="#EEF6FF">
+             d:DesignHeight="450" d:DesignWidth="300">
+
+    <StackPanel Margin="10" Background="#FFF">
+
+        <!-- Årsinkomst & Månadslön -->
+        <Border Padding="10" Margin="0,0,0,10" CornerRadius="6" Background="#EEF6FF">
             <StackPanel>
-                <TextBlock Text="Månadsprognos" FontWeight="Bold"/>
+                <TextBlock Text="Månadsprognos" FontWeight="Bold" FontSize="16" Margin="0,0,0,5"/>
 
                 <TextBlock Text="Årsinkomst"/>
                 <TextBox Text="{Binding AnnualIncome, UpdateSourceTrigger=PropertyChanged}"/>
@@ -26,5 +28,36 @@
                 <TextBlock Text="{Binding MonthlyIncome, StringFormat=C}"/>
             </StackPanel>
         </Border>
-    </Grid>
+
+        <!-- Frånvaro -->
+        <Border Padding="10" CornerRadius="6" Background="#F9F9F9">
+            <StackPanel>
+                <TextBlock Text="Frånvaro" FontWeight="Bold" FontSize="14" Margin="0,0,0,5"/>
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
+                    <TextBlock Text="Avdrag: " FontWeight="Bold"/>
+                    <TextBlock Text="{Binding AbsenceDeduction, StringFormat=-{0:C}}" Foreground="Red"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
+                    <TextBlock Text="Ersättning: " FontWeight="Bold"/>
+                    <TextBlock Text="{Binding AbsenceCompensation, StringFormat=+{0:C}}" Foreground="Green"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
+                    <TextBlock Text="Effekt: " FontWeight="Bold"/>
+                    <TextBlock Text="{Binding AbsenceNetEffect, StringFormat={}{0:+C;-C;0}}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Totalt månadsprognos -->
+        <Border Padding="10" Margin="0,10,0,0" CornerRadius="6" Background="#DFF0D8">
+            <StackPanel>
+                <TextBlock Text="Månadsprognos inklusive frånvaro" FontWeight="Bold" FontSize="14"/>
+                <TextBlock Text="{Binding MonthlyForecast, StringFormat=C}" FontSize="16" FontWeight="Bold"/>
+            </StackPanel>
+        </Border>
+
+    </StackPanel>
 </UserControl>
