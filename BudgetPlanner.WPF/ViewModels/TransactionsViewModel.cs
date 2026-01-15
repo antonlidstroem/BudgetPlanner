@@ -45,8 +45,7 @@ namespace BudgetPlanner.WPF.ViewModels
         public MonthSummaryViewModel MonthSummary { get; }
         public MonthlyForecastViewModel MonthlyForecast { get; }
         public YearSummaryViewModel YearSummary { get; }
-        public ObservableCollection<AbsenceItemViewModel> Absences { get; }
-
+ 
 
 
 
@@ -111,77 +110,79 @@ namespace BudgetPlanner.WPF.ViewModels
 
         private async void AddTransaction(object? _)
         {
-            //var net = Form.TransactionAmount;
-
-            //if (Form.TransactionCategory?.Name == "Lön" && Form.IsGrossIncome)
-            //    net *= (1 - Form.TaxRate / 100m);
-
-            var net = Form.EffectiveNetAmount;
-
+            if (Form.TransactionCategory == null)
+                return;
 
             var model = new BudgetTransaction
             {
-                Date = Form.TransactionDate,
-                Amount = net,
-                GrossAmount = Form.TransactionAmount,
-                CategoryId = Form.TransactionCategory!.Id,
+                StartDate = Form.TransactionDate,
+                EndDate = Form.ShowEndDate ? Form.EndDate : null,
+
+                NetAmount = Form.EffectiveAmount,
+                GrossAmount = (Form.TransactionCategory?.ToggleGrossNet == true && Form.IsGross)
+                ? Form.TransactionAmount
+                : null,
+
+                Rate = Form.ShowRate ? Form.Rate : null,
+                Month = Form.ShowMonth ? Form.TransactionMonth : null,
+
+                Description = Form.TransactionCategory.Description
+                              ?? Form.TransactionDescription,
+
+                CategoryId = Form.TransactionCategory.Id,
                 Recurrence = Form.TransactionRecurrence,
-                Description = Form.TransactionDescription,
-                Month = Form.TransactionRecurrence == Recurrence.Yearly ? Form.TransactionMonth : null,
                 IsActive = true
             };
 
             await repository.AddAsync(model);
             Transactions.Add(new TransactionItemViewModel(model));
 
-            if (Form.TransactionCategory?.Name == "VAB/Sjukfrånvaro")
-            {
-                var absence = new Absence
-                {
-                    Date = Form.AbsenceDate,
-                    Type = Form.AbsenceType,
-                    Hours = Form.AbsenceHours
-                };
+            RefreshFilter();
 
-                // Lägg till i MonthlyForecast
-                MonthlyForecast.AddAbsence(absence);
-
-                // Spara i databasen
-                using var db = new BudgetDbContext();
-                db.Absences.Add(absence);
-                await db.SaveChangesAsync();
-            }
+    
 
             Form.Clear();
         }
 
+        private void RefreshFilter()
+        {
+            RaisePropertyChanged(nameof(FilteredTotalIncome));
+            RaisePropertyChanged(nameof(FilteredTotalExpense));
+            RaisePropertyChanged(nameof(FilteredTotalResult));
+            RaisePropertyChanged(nameof(FilteredMonthlyForecast));
+        }
+
         private async void UpdateTransaction(object? _)
         {
-            if (Selected == null) return;
+            if (Selected == null || Form.TransactionCategory == null)
+                return;
 
-            //var net = Form.TransactionAmount;
-            //if (Form.TransactionCategory?.Name == "Lön" && Form.IsGrossIncome)
-            //    net *= (1 - Form.TaxRate / 100m);
-            var net = Form.EffectiveNetAmount;
+            var m = Selected.Model;
 
+            m.StartDate = Form.TransactionDate;
+            m.EndDate = Form.ShowEndDate ? Form.EndDate : null;
 
-            // Uppdatera modellen med alla fält
-            Selected.Model.Date = Form.TransactionDate;
-            Selected.Model.Amount = net;
-            Selected.Model.GrossAmount = Form.TransactionAmount;
-            Selected.Model.Description = Form.TransactionDescription;
-            Selected.Model.Category = Form.TransactionCategory;
-            Selected.Model.CategoryId = Form.TransactionCategory?.Id ?? 0;
-            Selected.Model.Recurrence = Form.TransactionRecurrence;
-            Selected.Model.Month = Form.TransactionRecurrence == Recurrence.Yearly ? Form.TransactionMonth : null;
-            Selected.Model.IsGrossIncome = Form.IsGrossIncome;
+            m.NetAmount = Form.EffectiveAmount;
+            m.GrossAmount = (Form.TransactionCategory?.ToggleGrossNet == true && Form.IsGross)
+                             ? Form.TransactionAmount
+                             : null;
 
-            // Spara till databasen
-            await repository.UpdateAsync(Selected.Model);
+            m.Rate = Form.ShowRate ? Form.Rate : null;
+            m.Month = Form.ShowMonth ? Form.TransactionMonth : null;
 
-            // Uppdatera listan
+            m.Description = Form.TransactionCategory.Description
+                            ?? Form.TransactionDescription;
+
+            m.CategoryId = Form.TransactionCategory.Id;
+            m.Category = Form.TransactionCategory;
+
+            m.Recurrence = Form.TransactionRecurrence;
+
+            await repository.UpdateAsync(m);
+
             Selected.RefreshFromModel();
         }
+
 
 
         private async void DeleteTransaction(object? _)
@@ -189,6 +190,8 @@ namespace BudgetPlanner.WPF.ViewModels
             if (Selected == null) return;
             await repository.DeleteAsync(Selected.Model);
             Transactions.Remove(Selected);
+
+            RefreshFilter();
         }
 
         private bool _isInEditMode;
@@ -218,15 +221,17 @@ namespace BudgetPlanner.WPF.ViewModels
 
                 IsInEditMode = true;
 
-                Form.TransactionDate = value.Date;
-                Form.TransactionAmount = value.GrossAmount > 0
-                ? value.GrossAmount
-                : value.Amount;
-
-                Form.IsGrossIncome = value.IsGrossIncome ?? false;
-
-                Form.TransactionDescription = value.Description;
                 Form.TransactionCategory = value.Category;
+
+                Form.IsGross = Form.TransactionCategory?.ToggleGrossNet == true && value.GrossAmount != value.NetAmount;
+
+                Form.TransactionAmount = Form.IsGross && value.GrossAmount.HasValue
+                    ? value.GrossAmount.Value
+                    : value.NetAmount;
+
+
+                Form.Rate = value.Rate;
+                Form.TransactionDescription = value.Description;
                 Form.TransactionRecurrence = value.Recurrence;
                 Form.TransactionMonth = value.Month;
             }
@@ -276,12 +281,9 @@ namespace BudgetPlanner.WPF.ViewModels
             }
         }
 
-        public ObservableCollection<AbsenceType> AbsenceTypes { get; } = new()
-        {
-            AbsenceType.Sick,
-            AbsenceType.Vab
-        };
+      
 
+       
 
 
 

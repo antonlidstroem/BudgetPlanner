@@ -17,25 +17,34 @@ namespace BudgetPlanner.WPF.ViewModels.Items
         }
 
 
-        public DateTime Date
+        public DateTime StartDate
         {
-            get { return model.Date; }
-            set { model.Date = value;
+            get { return model.StartDate; }
+            set { model.StartDate = value;
                 RaisePropertyChanged();
             } 
         }
-       
-        public decimal Amount 
+        public DateTime? EndDate
         {
-            get { return model.Amount; }
+            get { return model.EndDate; }
             set
             {
-                model.Amount = value;
+                model.EndDate = value;
                 RaisePropertyChanged();
             }
         }
 
-        public decimal GrossAmount
+        public decimal NetAmount 
+        {
+            get { return model.NetAmount; }
+            set
+            {
+                model.NetAmount = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public decimal? GrossAmount
         {
             get => model.GrossAmount;
             set
@@ -76,25 +85,17 @@ namespace BudgetPlanner.WPF.ViewModels.Items
             }
         }
 
-        public decimal? TaxRate 
+        public decimal? Rate 
         {
-            get { return model.TaxRate; }
+            get { return model.Rate; }
             set
             {
-                model.TaxRate = value;
+                model.Rate = value;
                 RaisePropertyChanged();
             }
         }
 
 
-        public bool? IsGrossIncome
-        {     get { return model.IsGrossIncome; }
-            set
-            {
-                model.IsGrossIncome = value;
-                RaisePropertyChanged();
-            }
-        }
 
 
         public Category? Category
@@ -136,16 +137,19 @@ namespace BudgetPlanner.WPF.ViewModels.Items
       
             public void RefreshFromModel()
         {
-            RaisePropertyChanged(nameof(Date));
-            RaisePropertyChanged(nameof(Amount));
+            RaisePropertyChanged(nameof(StartDate));
+            RaisePropertyChanged(nameof(EndDate));
+            RaisePropertyChanged(nameof(NetAmount));
             RaisePropertyChanged(nameof(GrossAmount));
             RaisePropertyChanged(nameof(Category));
             RaisePropertyChanged(nameof(Recurrence));
             RaisePropertyChanged(nameof(Description));
             RaisePropertyChanged(nameof(Month));
-            RaisePropertyChanged(nameof(Type)); 
+            RaisePropertyChanged(nameof(Type));
+            RaisePropertyChanged(nameof(Rate));
+            RaisePropertyChanged(nameof(IsActive));
+            RaisePropertyChanged(nameof(Month));
         }
-
     }
 }
 

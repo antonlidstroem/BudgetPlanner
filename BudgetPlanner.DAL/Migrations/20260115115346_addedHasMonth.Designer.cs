@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BudgetPlanner.DAL.Migrations
 {
     [DbContext(typeof(BudgetDbContext))]
-    [Migration("20260114153555_init")]
-    partial class init
+    [Migration("20260115115346_addedHasMonth")]
+    partial class addedHasMonth
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,28 +25,6 @@ namespace BudgetPlanner.DAL.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("BudgetPlanner.DAL.Models.Absence", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double>("Hours")
-                        .HasColumnType("float");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Absences");
-                });
-
             modelBuilder.Entity("BudgetPlanner.DAL.Models.BudgetTransaction", b =>
                 {
                     b.Property<int>("Id")
@@ -55,17 +33,14 @@ namespace BudgetPlanner.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<decimal>("GrossAmount")
                         .HasColumnType("decimal(18,2)");
@@ -73,17 +48,20 @@ namespace BudgetPlanner.DAL.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("IsGrossIncome")
-                        .HasColumnType("bit");
-
                     b.Property<int?>("Month")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("NetAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("Rate")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Recurrence")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("TaxRate")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -100,9 +78,27 @@ namespace BudgetPlanner.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AdjustmentType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DefaultRate")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("HasEndDate")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasMonth")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("ToggleGrossNet")
+                        .HasColumnType("bit");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
@@ -115,68 +111,105 @@ namespace BudgetPlanner.DAL.Migrations
                         new
                         {
                             Id = 1,
+                            HasEndDate = false,
+                            HasMonth = false,
                             Name = "Mat",
-                            Type = 1
+                            ToggleGrossNet = false,
+                            Type = 0
                         },
                         new
                         {
                             Id = 2,
+                            HasEndDate = false,
+                            HasMonth = false,
                             Name = "Hus & drift",
-                            Type = 1
+                            ToggleGrossNet = false,
+                            Type = 0
                         },
                         new
                         {
                             Id = 3,
+                            HasEndDate = false,
+                            HasMonth = false,
                             Name = "Transport",
-                            Type = 1
+                            ToggleGrossNet = false,
+                            Type = 0
                         },
                         new
                         {
                             Id = 4,
+                            HasEndDate = false,
+                            HasMonth = false,
                             Name = "Fritid",
-                            Type = 1
+                            ToggleGrossNet = false,
+                            Type = 0
                         },
                         new
                         {
                             Id = 5,
+                            HasEndDate = false,
+                            HasMonth = false,
                             Name = "Barn",
-                            Type = 1
+                            ToggleGrossNet = false,
+                            Type = 0
                         },
                         new
                         {
                             Id = 6,
+                            HasEndDate = false,
+                            HasMonth = false,
                             Name = "Streaming-tjänster",
-                            Type = 1
+                            ToggleGrossNet = false,
+                            Type = 0
                         },
                         new
                         {
                             Id = 7,
+                            HasEndDate = false,
+                            HasMonth = false,
                             Name = "SaaS-produkter",
-                            Type = 1
+                            ToggleGrossNet = false,
+                            Type = 0
                         },
                         new
                         {
                             Id = 8,
+                            AdjustmentType = 0,
+                            DefaultRate = 30,
+                            HasEndDate = false,
+                            HasMonth = false,
                             Name = "Lön",
+                            ToggleGrossNet = true,
                             Type = 0
                         },
                         new
                         {
                             Id = 9,
+                            HasEndDate = false,
+                            HasMonth = false,
                             Name = "Bidrag",
+                            ToggleGrossNet = false,
                             Type = 0
                         },
                         new
                         {
                             Id = 10,
+                            HasEndDate = false,
+                            HasMonth = false,
                             Name = "Hobbyverksamhet",
+                            ToggleGrossNet = false,
                             Type = 0
                         },
                         new
                         {
                             Id = 11,
+                            AdjustmentType = 0,
+                            DefaultRate = 80,
+                            HasEndDate = true,
+                            HasMonth = false,
                             Name = "VAB/Sjukfrånvaro",
-                            Type = 1
+                            ToggleGrossNet = false,
+                            Type = 0
                         });
                 });
 

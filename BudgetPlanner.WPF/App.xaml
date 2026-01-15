@@ -8,6 +8,7 @@
         <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <conv:NullToBoolConverter x:Key="NullToBoolConverter"/>
         <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        
 
         <!-- Återanvändbar stil för kategoricomboBox -->
         <Style x:Key="CategoryComboBoxItemStyle" TargetType="ComboBoxItem">

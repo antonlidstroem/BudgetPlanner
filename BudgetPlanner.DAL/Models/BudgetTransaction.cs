@@ -10,26 +10,21 @@ namespace BudgetPlanner.DAL.Models
         Monthly,
         Yearly
     }
-
     public class BudgetTransaction
     {
         public int Id { get; set; }
-        public DateTime Date { get; set; }
-        public decimal Amount { get; set; } //NETTO
-        public decimal GrossAmount { get; set; } //BRUTTO
-
+        public DateTime StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public decimal NetAmount { get; set; } 
+        public decimal? GrossAmount { get; set; } 
         public string? Description { get; set; }
         public int CategoryId { get; set; }
         public Category? Category { get; set; }
         public Recurrence Recurrence { get; set; }
         public bool IsActive { get; set; } = true;
         public int? Month { get; set; }
-        public decimal? TaxRate { get; set; } = 30;
-        public bool? IsGrossIncome { get; set; } = true;
-
-
-
+        public decimal? Rate { get; set; }
         public TransactionType Type => Category?.Type ?? TransactionType.Expense;
-
+        public AdjustmentType RateAdjustmentType => Category?.AdjustmentType ?? AdjustmentType.Deduction;
     }
 }

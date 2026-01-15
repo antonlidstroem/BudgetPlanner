@@ -4,99 +4,183 @@
              xmlns:conv="clr-namespace:BudgetPlanner.WPF.Converters"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-
-
              mc:Ignorable="d">
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="120"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="30"/>
-        </Grid.ColumnDefinitions>
 
-        <!-- Rubrik -->
-        <TextBlock Grid.Row="0" Grid.ColumnSpan="3" Text="{Binding FormTitle}" FontWeight="Bold" FontSize="14" Margin="0,0,0,10"/>
+    <UserControl.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <conv:NullToBoolConverter x:Key="NullToBoolConverter"/>
+    </UserControl.Resources>
 
-        <!-- Datum -->
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Datum:" VerticalAlignment="Center"/>
-        <DatePicker Grid.Row="1" Grid.Column="1" SelectedDate="{Binding Form.TransactionDate, Mode=TwoWay}"/>
-        <CheckBox Grid.Row="1" Grid.Column="2" IsChecked="{Binding Filter.FilterByDate}"/>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="15">
 
-        <!-- Anteckning -->
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="Anteckning:" VerticalAlignment="Center"/>
-        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Form.TransactionDescription, Mode=TwoWay}"/>
-        <CheckBox Grid.Row="2" Grid.Column="2" IsChecked="{Binding Filter.FilterByDescription}"/>
+            <!-- Layout -->
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="140"/>
+                <!-- Etikett -->
+                <ColumnDefinition Width="260"/>
+                <!-- Input -->
+                <ColumnDefinition Width="120"/>
+                <!-- Filter -->
+            </Grid.ColumnDefinitions>
 
-        <!-- Belopp -->
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="Belopp:" VerticalAlignment="Center"/>
-        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Form.TransactionAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}"/>
-        <CheckBox Grid.Row="3" Grid.Column="2" IsChecked="{Binding Filter.FilterByAmount}"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Rubrik -->
+                <RowDefinition Height="Auto"/>
+                <!-- Startdatum -->
+                <RowDefinition Height="Auto"/>
+                <!-- Slutdatum -->
+                <RowDefinition Height="Auto"/>
+                <!-- Anteckning -->
+                <RowDefinition Height="Auto"/>
+                <!-- Belopp -->
+                <RowDefinition Height="Auto"/>
+                <!-- Kategori -->
+                <RowDefinition Height="Auto"/>
+                <!-- Återkommande -->
+                <RowDefinition Height="Auto"/>
+                <!-- Månad -->
+                <RowDefinition Height="Auto"/>
+                <!-- Procentsats -->
+                <RowDefinition Height="Auto"/>
+                <!-- Knappar -->
+            </Grid.RowDefinitions>
 
-        <!-- Kategori -->
-        <TextBlock Grid.Row="4" Grid.Column="0" Text="Kategori:" VerticalAlignment="Center"/>
-        <ComboBox Grid.Row="4" Grid.Column="1"
-                  ItemsSource="{Binding Categories}" 
-                  SelectedItem="{Binding Form.TransactionCategory, Mode=TwoWay}"
-                  SelectedValuePath="Id"
-                  ItemTemplate="{StaticResource CategoryComboBoxItemTemplate}"
-                  ItemContainerStyle="{StaticResource CategoryComboBoxItemStyle}"/>
-        <CheckBox Grid.Row="4" Grid.Column="2" IsChecked="{Binding Filter.FilterByCategory}"/>
+            <!-- Rubrik -->
+            <TextBlock Grid.Row="0" Grid.ColumnSpan="3"
+                       Text="{Binding FormTitle}"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,0,0,15"/>
 
-        <!-- Återkommande -->
-        <TextBlock Grid.Row="5" Grid.Column="0" Text="Återkommande:" VerticalAlignment="Center"/>
-        <ComboBox Grid.Row="5" Grid.Column="1" SelectedItem="{Binding Form.TransactionRecurrence}" ItemsSource="{Binding Form.RecurrenceValues}"/>
-        <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding Filter.FilterByRecurrence}"/>
+            <!-- Startdatum -->
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Startdatum:" VerticalAlignment="Center"/>
+            <DatePicker Grid.Row="1" Grid.Column="1"
+                        Width="250"
+                        SelectedDate="{Binding Form.TransactionDate, Mode=TwoWay}"/>
+            <CheckBox Grid.Row="1" Grid.Column="2"
+                      IsChecked="{Binding Filter.FilterByDate}"
+                      VerticalAlignment="Center"/>
 
-        <!-- Knappar -->
-        <StackPanel Grid.Row="10" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,10,0,0">
-            <Button Content="Lägg till" Command="{Binding AddCommand}" Style="{StaticResource EditModeButtonStyle}" Width="80"/>
-            <Button Content="Uppdatera" Command="{Binding UpdateCommand}" Style="{StaticResource EditModeVisibleButtonStyle}" Width="80"/>
-            <Button Content="Avbryt" Command="{Binding CancelEditCommand}" Style="{StaticResource EditModeVisibleButtonStyle}" Width="80"/>
-            <Button Content="Ta bort" Command="{Binding DeleteCommand}" Width="80"
-                    IsEnabled="{Binding Selected, Converter={StaticResource NullToBoolConverter}}"/>
-        </StackPanel>
+            <!-- Slutdatum -->
+            <TextBlock Grid.Row="2" Grid.Column="0"
+                       Text="Slutdatum:"
+                       VerticalAlignment="Center"
+                       Visibility="{Binding Form.ShowEndDate, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            <DatePicker Grid.Row="2" Grid.Column="1"
+                        Width="250"
+                        SelectedDate="{Binding Form.EndDate}"
+                        Visibility="{Binding Form.ShowEndDate, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-        <!-- Brutto / Netto (endast Lön) -->
-            <CheckBox Grid.Row="7" Grid.Column="1"
-          Content="Beloppet är brutto"
-          IsChecked="{Binding Form.IsGrossIncome}"
-          Visibility="{Binding Form.ShowIncomeOptions, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            <!-- Anteckning -->
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Anteckning:" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="3" Grid.Column="1"
+                     Width="250"
+                     Text="{Binding Form.TransactionDescription, Mode=TwoWay}"/>
+            <CheckBox Grid.Row="3" Grid.Column="2"
+                      IsChecked="{Binding Filter.FilterByDescription}"
+                      VerticalAlignment="Center"/>
 
-            <!-- Skattesats -->
+            <!-- Belopp -->
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Belopp:" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="4" Grid.Column="1"
+                     Width="250"
+                     Text="{Binding Form.TransactionAmount,
+                                    Mode=TwoWay,
+                                    UpdateSourceTrigger=PropertyChanged,
+                                    ValidatesOnExceptions=True}"/>
+            <CheckBox Grid.Row="4" Grid.Column="2"
+                      IsChecked="{Binding Filter.FilterByAmount}"
+                      VerticalAlignment="Center"/>
+
+            <!-- Kategori -->
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="Kategori:" VerticalAlignment="Center"/>
+            <ComboBox Grid.Row="5" Grid.Column="1"
+                      Width="250"
+                      ItemsSource="{Binding Categories}"
+                      SelectedItem="{Binding Form.TransactionCategory}"
+                      ItemTemplate="{StaticResource CategoryComboBoxItemTemplate}"
+                      ItemContainerStyle="{StaticResource CategoryComboBoxItemStyle}"/>
+            <CheckBox Grid.Row="5" Grid.Column="2"
+                      IsChecked="{Binding Filter.FilterByCategory}"
+                      VerticalAlignment="Center"/>
+
+            <!-- Återkommande -->
+            <TextBlock Grid.Row="6" Grid.Column="0" Text="Återkommande:" VerticalAlignment="Center"/>
+            <ComboBox Grid.Row="6" Grid.Column="1"
+                      Width="250"
+                      ItemsSource="{Binding Form.RecurrenceValues}"
+                      SelectedItem="{Binding Form.TransactionRecurrence}"/>
+            <CheckBox Grid.Row="6" Grid.Column="2"
+                      IsChecked="{Binding Filter.FilterByRecurrence}"
+                      VerticalAlignment="Center"/>
+
+            <!-- Kategoribeskrivning -->
+            <TextBlock Grid.Row="6" Grid.Column="1"
+                       Margin="0,30,0,0"
+                       Foreground="Gray"
+                       TextWrapping="Wrap"
+                       Text="{Binding Form.TransactionCategory.Description}"
+                       Visibility="{Binding Form.ShowDescription,
+                                    Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+            <!-- Månad (endast Yearly) -->
+            <TextBlock Grid.Row="7" Grid.Column="0"
+                       Text="Månad:"
+                       VerticalAlignment="Center"
+                       Visibility="{Binding Form.ShowMonth,
+                                    Converter={StaticResource BoolToVisibilityConverter}}"/>
+            <ComboBox Grid.Row="7" Grid.Column="1"
+                      Width="250"
+                      ItemsSource="{Binding Form.Months}"
+                      SelectedItem="{Binding Form.TransactionMonth}"
+                      Visibility="{Binding Form.ShowMonth,
+                                   Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+            <!-- Procentsats + Brutto -->
             <TextBlock Grid.Row="8" Grid.Column="0"
-           Text="Skatt %:"
-           Visibility="{Binding Form.ShowIncomeOptions, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                       Text="Procentsats:"
+                       VerticalAlignment="Center"/>
+            <StackPanel Grid.Row="8" Grid.Column="1"
+                        Orientation="Horizontal">
+                <TextBox Width="120"
+                         Text="{Binding Form.Rate}"
+                         Visibility="{Binding Form.ShowRate,
+                                      Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <CheckBox Content="Brutto"
+                          Margin="10,0,0,0"
+                          IsChecked="{Binding Form.IsGross}"
+                          Visibility="{Binding Form.ShowGrossNetToggle,
+                                       Converter={StaticResource BoolToVisibilityConverter}}"/>
+            </StackPanel>
 
-            <TextBox Grid.Row="8" Grid.Column="1"
-         Text="{Binding Form.TaxRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-         Visibility="{Binding Form.ShowIncomeOptions, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            <!-- Knappar -->
+            <StackPanel Grid.Row="9" Grid.ColumnSpan="3"
+                        Orientation="Horizontal"
+                        Margin="0,15,0,0">
+                <Button Content="Lägg till"
+                        Width="90"
+                        Margin="0,0,10,0"
+                        Command="{Binding AddCommand}"
+                        Style="{StaticResource EditModeButtonStyle}"/>
+                <Button Content="Uppdatera"
+                        Width="90"
+                        Margin="0,0,10,0"
+                        Command="{Binding UpdateCommand}"
+                        Style="{StaticResource EditModeVisibleButtonStyle}"/>
+                <Button Content="Avbryt"
+                        Width="90"
+                        Margin="0,0,10,0"
+                        Command="{Binding CancelEditCommand}"
+                        Style="{StaticResource EditModeVisibleButtonStyle}"/>
+                <Button Content="Ta bort"
+                        Width="90"
+                        Command="{Binding DeleteCommand}"
+                        IsEnabled="{Binding Selected,
+                                            Converter={StaticResource NullToBoolConverter}}"/>
+            </StackPanel>
 
-        <!--Absence-->
-        <StackPanel Grid.Row="6" Grid.ColumnSpan="2" Visibility="{Binding ShowAbsenceFields, Converter={StaticResource BoolToVisibilityConverter}}" Margin="0,10,0,0">
-            <TextBlock Text="Frånvarodatum:"/>
-            <DatePicker SelectedDate="{Binding AbsenceDate}"/>
-
-            <TextBlock Text="Typ:"/>
-            <ComboBox SelectedItem="{Binding AbsenceType}" ItemsSource="{Binding AbsenceTypes}"/>
-
-            <TextBlock Text="Timmar:"/>
-            <TextBox Text="{Binding AbsenceHours}"/>
-        </StackPanel>
-
-
-
-
-    </Grid>
+        </Grid>
+    </ScrollViewer>
 </UserControl>

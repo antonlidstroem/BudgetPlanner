@@ -28,11 +28,11 @@ namespace BudgetPlanner.WPF.ViewModels.Summaries
 
         public decimal TotalIncome =>
             Items.Where(t => t.Type == TransactionType.Income)
-                 .Sum(t => t.Amount);
+                 .Sum(t => t.NetAmount);
 
         public decimal TotalExpense =>
             Items.Where(t => t.Type == TransactionType.Expense)
-                 .Sum(t => t.Amount);
+                 .Sum(t => t.NetAmount);
 
         public decimal Result => TotalIncome - TotalExpense;
 

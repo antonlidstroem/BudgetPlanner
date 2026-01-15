@@ -121,9 +121,9 @@ namespace BudgetPlanner.WPF.ViewModels.Filters
             bool typeFilter = (ShowIncome && vm.Type == TransactionType.Income) ||
                               (ShowExpense && vm.Type == TransactionType.Expense);
 
-            bool dateFilter = !FilterByDate || vm.Date.Date == FilterDate?.Date;
+            bool dateFilter = !FilterByDate || vm.StartDate.Date == FilterDate?.Date;
             bool descriptionFilter = !FilterByDescription || vm.Description.Contains(FilterDescription, StringComparison.InvariantCultureIgnoreCase);
-            bool amountFilter = !FilterByAmount || vm.Amount == FilterAmount;
+            bool amountFilter = !FilterByAmount || vm.NetAmount == FilterAmount;
 
             return recurrenceFilter && categoryFilter && typeFilter && dateFilter && descriptionFilter && amountFilter;
         }
@@ -132,10 +132,10 @@ namespace BudgetPlanner.WPF.ViewModels.Filters
         // Summeringar
         // ====================================
         public decimal TotalIncome(IEnumerable<TransactionItemViewModel> items) =>
-            items.Where(Matches).Where(t => t.Type == TransactionType.Income).Sum(t => t.Amount);
+            items.Where(Matches).Where(t => t.Type == TransactionType.Income).Sum(t => t.NetAmount);
 
         public decimal TotalExpense(IEnumerable<TransactionItemViewModel> items) =>
-            items.Where(Matches).Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount);
+            items.Where(Matches).Where(t => t.Type == TransactionType.Expense).Sum(t => t.NetAmount);
 
         public decimal Result(IEnumerable<TransactionItemViewModel> items) =>
             TotalIncome(items) - TotalExpense(items);

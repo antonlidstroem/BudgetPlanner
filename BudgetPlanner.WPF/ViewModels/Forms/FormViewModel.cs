@@ -35,13 +35,26 @@ namespace BudgetPlanner.WPF.ViewModels.Forms
             set
             {
                 _transactionCategory = value;
-                ShowAbsenceFields = _transactionCategory?.Name == "VAB/Sjukfrånvaro";
                 RaisePropertyChanged();
-                RaisePropertyChanged(nameof(IsIncomeCategorySelected));
-                RaisePropertyChanged(nameof(MonthVisibility));
-                RaisePropertyChanged(nameof(ShowIncomeOptions));
+
+                RaisePropertyChanged(nameof(ShowEndDate));
+                RaisePropertyChanged(nameof(ShowDescription));
+                RaisePropertyChanged(nameof(ShowMonth));
+                RaisePropertyChanged(nameof(ShowRate));
+                RaisePropertyChanged(nameof(ShowGrossNetToggle));
+
+                if (ShowGrossNetToggle != true)
+                {
+                    IsGross = false;
+                }
+
+                if (!ShowMonth)
+                {
+                    TransactionMonth = null;
+                }
             }
         }
+
 
         // UPPREPANDE
         private Recurrence _transactionRecurrence = Recurrence.OneTime;
@@ -50,61 +63,35 @@ namespace BudgetPlanner.WPF.ViewModels.Forms
             get => _transactionRecurrence;
             set
             {
-                _transactionRecurrence = value;
-                RaisePropertyChanged();
-                RaisePropertyChanged(nameof(MonthVisibility));
-                if (value != Recurrence.Yearly) TransactionMonth = null;
+                if (_transactionRecurrence != value)
+                {
+                    _transactionRecurrence = value;
+                    RaisePropertyChanged();
+                    RaisePropertyChanged(nameof(ShowMonth));
+
+                    if (!ShowMonth)
+                    {
+                        TransactionMonth = null;
+                    }
+                }
             }
         }
+
+
 
         // TRANSAKTIONSMÅNAD
         private int? _transactionMonth;
         public int? TransactionMonth
         {
             get => _transactionMonth;
-            set { _transactionMonth = value; RaisePropertyChanged(); }
-        }
-
-        // BRUTTOINKOMST
-        private bool _isGrossIncome;
-        public bool IsGrossIncome
-        {
-            get => _isGrossIncome;
             set
             {
-                _isGrossIncome = value;
+                _transactionMonth = value;
                 RaisePropertyChanged();
-                RaisePropertyChanged(nameof(EffectiveNetAmount));
             }
         }
 
 
-        // SKATTESATS
-        private decimal _taxRate = 30;
-        public decimal TaxRate
-        {
-            get => _taxRate;
-            set
-            {
-                _taxRate = value;
-                RaisePropertyChanged();
-                RaisePropertyChanged(nameof(EffectiveNetAmount));
-            }
-        }
-
-        public decimal EffectiveNetAmount
-        {
-            get
-            {
-                if (TransactionCategory?.Name != "Lön")
-                    return TransactionAmount;
-
-                if (!IsGrossIncome)
-                    return TransactionAmount;
-
-                return TransactionAmount * (1 - TaxRate / 100m);
-            }
-        }
 
 
         // ÅRSARBETSTID
@@ -130,19 +117,6 @@ namespace BudgetPlanner.WPF.ViewModels.Forms
         // MÅNADSINKOMST FRÅN TIMMAR
         public decimal MonthlyIncomeFromHours => HourlyRate * (AnnualHours / 12m);
 
-        // MONTH VISIBILITY
-        public Visibility MonthVisibility =>
-        TransactionCategory?.Name == "Lön"
-            ? Visibility.Collapsed
-            : TransactionRecurrence == Recurrence.Yearly
-                ? Visibility.Visible
-                : Visibility.Collapsed;
-
-        // LÖNKATEGORI VALD
-        public bool IsIncomeCategorySelected => TransactionCategory?.Name == "Lön";
-
-        public bool ShowIncomeOptions => TransactionCategory?.Type == TransactionType.Income;
-
 
         // RENSA FORMULÄRET
         public void Clear()
@@ -154,50 +128,70 @@ namespace BudgetPlanner.WPF.ViewModels.Forms
             TransactionDescription = string.Empty;
             TransactionMonth = null;
             RaisePropertyChanged(string.Empty);
-
-
         }
 
         public IEnumerable<Recurrence> RecurrenceValues { get; } =
     Enum.GetValues(typeof(Recurrence)).Cast<Recurrence>();
 
-        public bool IsMonthVisible =>
-    TransactionRecurrence == Recurrence.Yearly;
+        public bool ShowMonth => TransactionRecurrence == Recurrence.Yearly;
+
+
 
 
         // MÅNAD
         public IEnumerable<int> Months => Enumerable.Range(1, 12);
 
 
-        // Extra fält för frånvaro
-        private bool _showAbsenceFields;
-        public bool ShowAbsenceFields
+
+        public bool ShowEndDate =>
+    TransactionCategory?.HasEndDate == true;
+
+        public bool ShowDescription =>
+            !string.IsNullOrWhiteSpace(TransactionCategory?.Description);
+
+
+        public bool ShowRate =>
+            TransactionCategory?.DefaultRate != null;
+
+        public bool ShowGrossNetToggle =>
+            TransactionCategory?.ToggleGrossNet == true;
+
+
+        private bool _isGross;
+        public bool IsGross
         {
-            get => _showAbsenceFields;
-            set { _showAbsenceFields = value; RaisePropertyChanged(); }
+            get => _isGross;
+            set { _isGross = value; RaisePropertyChanged(); RaisePropertyChanged(nameof(EffectiveAmount)); }
         }
 
-        private DateTime _absenceDate = DateTime.Today;
-        public DateTime AbsenceDate
+        private decimal? _rate;
+        public decimal? Rate
         {
-            get => _absenceDate;
-            set { _absenceDate = value; RaisePropertyChanged(); }
+            get => _rate;
+            set { _rate = value; RaisePropertyChanged(); RaisePropertyChanged(nameof(EffectiveAmount)); }
         }
 
-        private AbsenceType _absenceType = AbsenceType.Sick;
-        public AbsenceType AbsenceType
+        public decimal EffectiveAmount
         {
-            get => _absenceType;
-            set { _absenceType = value; RaisePropertyChanged(); }
+            get
+            {
+                if (TransactionCategory?.ToggleGrossNet != true || !IsGross || Rate == null)
+                    return TransactionAmount;
+
+                var factor = Rate.Value / 100m;
+
+                return TransactionCategory.AdjustmentType == AdjustmentType.Deduction
+                    ? TransactionAmount * (1 - factor)
+                    : TransactionAmount * (1 + factor);
+            }
         }
 
-        private double _absenceHours = 8;
-        public double AbsenceHours
+        private DateTime? _endDate;
+        public DateTime? EndDate
         {
-            get => _absenceHours;
-            set { _absenceHours = value; RaisePropertyChanged(); }
+            get => _endDate;
+            set { _endDate = value; RaisePropertyChanged(); }
         }
-
 
 
     }
