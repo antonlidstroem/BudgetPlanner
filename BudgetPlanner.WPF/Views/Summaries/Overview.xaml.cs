@@ -14,11 +14,11 @@ using System.Windows.Shapes;
 namespace BudgetPlanner.WPF.Views.Summaries
 {
     /// <summary>
-    /// Interaction logic for YearSummary.xaml
+    /// Interaction logic for Overview.xaml
     /// </summary>
-    public partial class YearSummary : UserControl
+    public partial class Overview : UserControl
     {
-        public YearSummary()
+        public Overview()
         {
             InitializeComponent();
         }

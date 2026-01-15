@@ -39,7 +39,7 @@ namespace BudgetPlanner.DAL.Data
                 new Category { Id = 8, Name = "Lön", Type = TransactionType.Income, ToggleGrossNet = true, DefaultRate = 30, AdjustmentType = AdjustmentType.Deduction },
                 new Category { Id = 9, Name = "Bidrag", Type = TransactionType.Income },
                 new Category { Id = 10, Name = "Hobbyverksamhet", Type = TransactionType.Income },
-                new Category { Id = 11, Name = "VAB/Sjukfrånvaro", Type = TransactionType.Expense, HasEndDate = true, DefaultRate = 80, AdjustmentType = AdjustmentType.Deduction }
+                new Category { Id = 11, Name = "VAB/Sjukfrånvaro", Type = TransactionType.Expense, HasEndDate = true, ToggleGrossNet = true, DefaultRate = 80, AdjustmentType = AdjustmentType.Deduction }
             );
         }
 

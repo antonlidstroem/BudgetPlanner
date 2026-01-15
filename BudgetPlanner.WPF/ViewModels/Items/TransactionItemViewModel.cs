@@ -132,6 +132,14 @@ namespace BudgetPlanner.WPF.ViewModels.Items
         public TransactionType Type
         {
             get { return model.Type; }
+            set
+            {
+                if (model.Type != value)
+                {
+                    model.Type = value;
+                    RaisePropertyChanged();
+                }
+            }
         }
 
       
@@ -150,6 +158,13 @@ namespace BudgetPlanner.WPF.ViewModels.Items
             RaisePropertyChanged(nameof(IsActive));
             RaisePropertyChanged(nameof(Month));
         }
+
+        public void RefreshProperties()
+        {
+            RaisePropertyChanged(nameof(NetAmount));
+            RaisePropertyChanged(nameof(GrossAmount));
+        }
+
     }
 }
 

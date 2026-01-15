@@ -24,7 +24,9 @@ namespace BudgetPlanner.DAL.Models
         public bool IsActive { get; set; } = true;
         public int? Month { get; set; }
         public decimal? Rate { get; set; }
-        public TransactionType Type => Category?.Type ?? TransactionType.Expense;
+        //public TransactionType Type => Category?.Type ?? TransactionType.Expense;
+        public TransactionType Type { get; set; }
+
         public AdjustmentType RateAdjustmentType => Category?.AdjustmentType ?? AdjustmentType.Deduction;
     }
 }

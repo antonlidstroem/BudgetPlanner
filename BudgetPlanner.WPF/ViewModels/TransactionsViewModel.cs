@@ -16,6 +16,7 @@ using BudgetPlanner.WPF.ViewModels.Filters;
 using BudgetPlanner.WPF.ViewModels.Forms;
 using BudgetPlanner.WPF.ViewModels.Items;
 using BudgetPlanner.WPF.ViewModels.Summaries;
+using BudgetPlanner.WPF.Views.Summaries;
 
 namespace BudgetPlanner.WPF.ViewModels
 {
@@ -42,10 +43,7 @@ namespace BudgetPlanner.WPF.ViewModels
         public decimal FilteredMonthlyForecast => Filter.MonthlyForecast(Transactions);
 
         private TransactionItemViewModel? _selected;
-        public MonthSummaryViewModel MonthSummary { get; }
-        public MonthlyForecastViewModel MonthlyForecast { get; }
-        public YearSummaryViewModel YearSummary { get; }
- 
+        public SummariesOverviewViewModel Overview { get; }
 
 
 
@@ -57,9 +55,7 @@ namespace BudgetPlanner.WPF.ViewModels
             TransactionsView = CollectionViewSource.GetDefaultView(Transactions);
             TransactionsView.Filter = o => Filter.Matches((TransactionItemViewModel)o);
 
-            MonthSummary = new MonthSummaryViewModel(TransactionsView);
-            MonthlyForecast = new MonthlyForecastViewModel();
-            YearSummary = new YearSummaryViewModel(Transactions);
+            Overview = new SummariesOverviewViewModel(TransactionsView, Transactions);
 
             AddCommand = new DelegateCommand(AddTransaction);
             UpdateCommand = new DelegateCommand(UpdateTransaction, _ => Selected != null);
@@ -113,36 +109,56 @@ namespace BudgetPlanner.WPF.ViewModels
             if (Form.TransactionCategory == null)
                 return;
 
+            // Räkna netto och brutto korrekt
+            decimal net;
+            decimal? gross = null;
+
+            if (Form.TransactionCategory.ToggleGrossNet && Form.IsGross)
+            {
+                gross = Form.TransactionAmount; // summan användaren skrev in är brutto
+                var factor = Form.Rate ?? 0m;
+
+                net = Form.TransactionCategory.AdjustmentType == AdjustmentType.Deduction
+                    ? gross.Value * (1 - factor / 100m)
+                    : gross.Value * (1 + factor / 100m);
+            }
+            else
+            {
+                net = Form.TransactionAmount;
+            }
+
+            // Skapa modellen
             var model = new BudgetTransaction
             {
                 StartDate = Form.TransactionDate,
                 EndDate = Form.ShowEndDate ? Form.EndDate : null,
-
-                NetAmount = Form.EffectiveAmount,
-                GrossAmount = (Form.TransactionCategory?.ToggleGrossNet == true && Form.IsGross)
-                ? Form.TransactionAmount
-                : null,
-
+                NetAmount = net,
+                GrossAmount = gross,
                 Rate = Form.ShowRate ? Form.Rate : null,
                 Month = Form.ShowMonth ? Form.TransactionMonth : null,
-
-                Description = Form.TransactionCategory.Description
-                              ?? Form.TransactionDescription,
-
+                Description = Form.TransactionCategory.Description ?? Form.TransactionDescription,
                 CategoryId = Form.TransactionCategory.Id,
                 Recurrence = Form.TransactionRecurrence,
-                IsActive = true
+                IsActive = true,
+                Type = Form.TransactionCategory.Type
             };
 
             await repository.AddAsync(model);
-            Transactions.Add(new TransactionItemViewModel(model));
+
+            var vm = new TransactionItemViewModel(model);
+            Transactions.Add(vm);
+
+            vm.PropertyChanged += (_, __) =>
+            {
+                Overview.RaiseAll();
+            };
+
+            vm.RefreshProperties(); 
 
             RefreshFilter();
-
-    
-
             Form.Clear();
         }
+
 
         private void RefreshFilter()
         {
@@ -159,29 +175,45 @@ namespace BudgetPlanner.WPF.ViewModels
 
             var m = Selected.Model;
 
+            // Beräkna netto och brutto
+            decimal net;
+            decimal? gross = null;
+
+            if (Form.TransactionCategory.ToggleGrossNet && Form.IsGross)
+            {
+                gross = Form.TransactionAmount;
+                var factor = Form.Rate ?? 0m;
+                net = Form.TransactionCategory.AdjustmentType == AdjustmentType.Deduction
+                    ? gross.Value * (1 - factor / 100m)
+                    : gross.Value * (1 + factor / 100m);
+            }
+            else
+            {
+                net = Form.TransactionAmount;
+            }
+
+            // Uppdatera modellen
             m.StartDate = Form.TransactionDate;
             m.EndDate = Form.ShowEndDate ? Form.EndDate : null;
-
-            m.NetAmount = Form.EffectiveAmount;
-            m.GrossAmount = (Form.TransactionCategory?.ToggleGrossNet == true && Form.IsGross)
-                             ? Form.TransactionAmount
-                             : null;
-
+            m.NetAmount = net;
+            m.GrossAmount = gross;
             m.Rate = Form.ShowRate ? Form.Rate : null;
             m.Month = Form.ShowMonth ? Form.TransactionMonth : null;
-
-            m.Description = Form.TransactionCategory.Description
-                            ?? Form.TransactionDescription;
-
+            m.Description = Form.TransactionCategory.Description ?? Form.TransactionDescription;
             m.CategoryId = Form.TransactionCategory.Id;
             m.Category = Form.TransactionCategory;
-
             m.Recurrence = Form.TransactionRecurrence;
+            m.Type = Form.TransactionCategory.Type;
 
             await repository.UpdateAsync(m);
 
             Selected.RefreshFromModel();
+
+            // Uppdatera summeringar
+            Overview.RaiseAll();
+
         }
+
 
 
 
@@ -250,8 +282,8 @@ namespace BudgetPlanner.WPF.ViewModels
 
             TransactionsView.Refresh();
 
-            MonthSummary?.RaiseAll();
-            YearSummary?.RaiseAll();
+            Overview.RaiseAll();
+
 
             RaisePropertyChanged(nameof(FilteredTotalIncome));
             RaisePropertyChanged(nameof(FilteredTotalExpense));

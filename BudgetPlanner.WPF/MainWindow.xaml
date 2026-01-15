@@ -29,9 +29,10 @@
             <views:TransactionForm Grid.Row="0"/>
 
             <StackPanel Grid.Row="1">
-                <summaries:MonthSummary DataContext="{Binding MonthSummary}"/>
+                <!--<summaries:Summary DataContext="{Binding MonthSummary}"/>
                 <summaries:MonthlyForecast DataContext="{Binding MonthlyForecast}"/>
-                <summaries:YearSummary DataContext="{Binding YearSummary}"/>
+                <summaries:YearSummary DataContext="{Binding YearSummary}"/>-->
+                <summaries:Overview DataContext="{Binding Overview}"/>
             </StackPanel>
         </Grid>
     </Grid>

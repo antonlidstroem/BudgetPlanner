@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
+﻿using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
 using BudgetPlanner.DAL.Models;
 using BudgetPlanner.WPF.ViewModels.Base;
 using BudgetPlanner.WPF.ViewModels.Items;
@@ -15,7 +14,19 @@ namespace BudgetPlanner.WPF.ViewModels.Summaries
         public YearSummaryViewModel(ObservableCollection<TransactionItemViewModel> items)
         {
             _items = items;
-            _items.CollectionChanged += (_, __) => RaiseAll();
+
+            if (_items is INotifyCollectionChanged cc)
+            {
+                cc.CollectionChanged += (_, e) =>
+                {
+                    if (e.NewItems != null)
+                    {
+                        foreach (TransactionItemViewModel t in e.NewItems)
+                            t.PropertyChanged += (_, __) => RaiseAll();
+                    }
+                    RaiseAll();
+                };
+            }
 
             foreach (var item in _items)
                 item.PropertyChanged += (_, __) => RaiseAll();
@@ -38,5 +49,4 @@ namespace BudgetPlanner.WPF.ViewModels.Summaries
             RaisePropertyChanged(nameof(Result));
         }
     }
-
 }

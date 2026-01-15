@@ -161,14 +161,24 @@ namespace BudgetPlanner.WPF.ViewModels.Forms
         public bool IsGross
         {
             get => _isGross;
-            set { _isGross = value; RaisePropertyChanged(); RaisePropertyChanged(nameof(EffectiveAmount)); }
+            set
+            {
+                _isGross = value;
+                RaisePropertyChanged();
+                RaisePropertyChanged(nameof(EffectiveAmount)); // Viktigt!
+            }
         }
 
         private decimal? _rate;
         public decimal? Rate
         {
             get => _rate;
-            set { _rate = value; RaisePropertyChanged(); RaisePropertyChanged(nameof(EffectiveAmount)); }
+            set
+            {
+                _rate = value;
+                RaisePropertyChanged();
+                RaisePropertyChanged(nameof(EffectiveAmount)); // Viktigt!
+            }
         }
 
         public decimal EffectiveAmount
