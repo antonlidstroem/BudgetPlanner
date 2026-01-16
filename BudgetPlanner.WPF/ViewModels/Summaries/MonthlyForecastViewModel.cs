@@ -11,10 +11,46 @@ public class MonthlyForecastViewModel : ViewModelBase
     public MonthlyForecastViewModel(IEnumerable<TransactionItemViewModel> items)
     {
         _items = items;
+
+        foreach (var item in items)
+        {
+            item.PropertyChanged += (_, __) => Refresh();
+        }
+       
     }
 
-    public decimal AnnualIncome { get; set; }
-    public decimal AnnualWorkHours { get; set; }
+    public decimal _annualIncome { get; set; }
+    public decimal AnnualIncome
+    {
+        get => _annualIncome;
+        set
+        {
+            if (_annualIncome != value)
+            {
+                _annualIncome = value;
+                RaisePropertyChanged();
+                RaisePropertyChanged(nameof(HourlyRate));
+                RaisePropertyChanged(nameof(MonthlyIncome));
+                RaisePropertyChanged(nameof(MonthlyForecast));
+            }
+        }
+    }
+    private decimal _annualWorkHours;
+    public decimal AnnualWorkHours
+    {
+        get => _annualWorkHours;
+        set
+        {
+            if (_annualWorkHours != value)
+            {
+                _annualWorkHours = value;
+                RaisePropertyChanged();
+                RaisePropertyChanged(nameof(HourlyRate));
+                RaisePropertyChanged(nameof(MonthlyIncome));
+                RaisePropertyChanged(nameof(MonthlyForecast));
+            }
+        }
+    }
 
     public decimal HourlyRate => AnnualWorkHours == 0 ? 0 : AnnualIncome / AnnualWorkHours;
     public decimal MonthlyIncome => AnnualIncome / 12m;

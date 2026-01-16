@@ -12,28 +12,25 @@
         MinHeight="600" 
         MinWidth="750">
 
-    <Grid Margin="10">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="4*"/>
-            <ColumnDefinition Width="2*"/>
-        </Grid.ColumnDefinitions>
+    <Grid Margin="16">
+        <TabControl>
 
-        <views:TransactionListView Grid.Column="0" Margin="0,0,10,0"/>
+            <TabItem Header="Transaktioner">
+                <Grid Margin="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+                    <views:TransactionListView Grid.Column="0" Margin="0,0,12,0"/>
+                    <views:TransactionForm Grid.Column="1"/>
+                </Grid>
+            </TabItem>
 
-            <views:TransactionForm Grid.Row="0"/>
+            <TabItem Header="Översikt">
+                <summaries:Overview DataContext="{Binding Overview}" />
+            </TabItem>
 
-            <StackPanel Grid.Row="1">
-                <!--<summaries:Summary DataContext="{Binding MonthSummary}"/>
-                <summaries:MonthlyForecast DataContext="{Binding MonthlyForecast}"/>
-                <summaries:YearSummary DataContext="{Binding YearSummary}"/>-->
-                <summaries:Overview DataContext="{Binding Overview}"/>
-            </StackPanel>
-        </Grid>
+        </TabControl>
     </Grid>
 </Window>
