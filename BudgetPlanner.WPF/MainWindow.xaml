@@ -4,33 +4,56 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BudgetPlanner.WPF"
-       xmlns:views="clr-namespace:BudgetPlanner.WPF.Views"
+        xmlns:views="clr-namespace:BudgetPlanner.WPF.Views"
         xmlns:summaries="clr-namespace:BudgetPlanner.WPF.Views.Summaries"
         mc:Ignorable="d"
+
         Title="Budgetplanerare"
         Language="sv-SE"
-        MinHeight="600" 
-        MinWidth="750">
+
+        SizeToContent="WidthAndHeight"
+        MinWidth="1100"
+        MinHeight="750"
+
+        WindowStartupLocation="CenterScreen">
+
 
     <Grid Margin="16">
-        <TabControl>
+        <Grid Margin="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
 
-            <TabItem Header="Transaktioner">
-                <Grid Margin="12">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*"/>
-                        <ColumnDefinition Width="2*"/>
-                    </Grid.ColumnDefinitions>
+            <!-- VÄNSTER: Transaktionslista -->
+            <views:TransactionListView
+        Grid.Column="0"
+        Margin="0,0,12,0" />
 
-                    <views:TransactionListView Grid.Column="0" Margin="0,0,12,0"/>
-                    <views:TransactionForm Grid.Column="1"/>
-                </Grid>
-            </TabItem>
+            <!-- HÖGER: Overview + Form -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-            <TabItem Header="Översikt">
-                <summaries:Overview DataContext="{Binding Overview}" />
-            </TabItem>
+                <!-- Overview (kompakt, alltid synlig) -->
+                <Border Margin="0,0,0,12"
+                Padding="12"
+                Background="#F5F7FA"
+                CornerRadius="8">
+                    <views:TransactionForm />
+                </Border>
 
-        </TabControl>
+                <!-- Form -->
+                <Border Grid.Row="1"
+                Padding="12"
+                Background="White"
+                CornerRadius="8">
+                    <summaries:Overview />
+                </Border>
+            </Grid>
+        </Grid>
+
     </Grid>
 </Window>
