@@ -1,33 +1,37 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Windows.Data;
+﻿using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using BudgetPlanner.WPF.ViewModels.Base;
+using BudgetPlanner.WPF.ViewModels.Filters;
 using BudgetPlanner.WPF.ViewModels.Items;
 
-namespace BudgetPlanner.WPF.ViewModels.Summaries
+public class SummariesOverviewViewModel : ViewModelBase
 {
-    public class SummariesOverviewViewModel : ViewModelBase
+    public PeriodFilterViewModel Period { get; } = new PeriodFilterViewModel();
+
+    public MonthlySummaryViewModel Monthly { get; }
+    public YearlySummaryViewModel Yearly { get; }
+    public MonthlyForecastViewModel Forecast { get; }
+
+    public SummariesOverviewViewModel(ObservableCollection<TransactionItemViewModel> items)
     {
-        public MonthSummaryViewModel MonthSummary { get; }
-        public YearSummaryViewModel YearSummary { get; }
-        public MonthlyForecastViewModel MonthlyForecast { get; }
+        Monthly = new MonthlySummaryViewModel(items, Period);
+        Yearly = new YearlySummaryViewModel(items, Period);
+        Forecast = new MonthlyForecastViewModel(items);
 
-        public SummariesOverviewViewModel(ICollectionView transactionsView, ObservableCollection<TransactionItemViewModel> allItems)
+        if (items is INotifyCollectionChanged incc)
         {
-            int currentMonth = DateTime.Today.Month;
-            int currentYear = DateTime.Today.Year;
-
-            MonthSummary = new MonthSummaryViewModel(transactionsView, currentMonth, currentYear);
-            YearSummary = new YearSummaryViewModel(allItems);
-            MonthlyForecast = new MonthlyForecastViewModel(transactionsView);
+            incc.CollectionChanged += (_, __) =>
+            {
+                Monthly.Refresh();
+                Yearly.Refresh();
+                Forecast.Refresh();
+            };
         }
 
-        public void RaiseAll()
+        Period.PropertyChanged += (_, __) =>
         {
-            MonthSummary.RaiseAll();
-            YearSummary.RaiseAll();
-            MonthlyForecast.RaiseAll();
-        }
+            Monthly.Refresh();
+            Yearly.Refresh();
+        };
     }
 }

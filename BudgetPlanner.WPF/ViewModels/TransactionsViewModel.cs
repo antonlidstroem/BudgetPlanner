@@ -15,7 +15,6 @@ using BudgetPlanner.WPF.ViewModels.Base;
 using BudgetPlanner.WPF.ViewModels.Filters;
 using BudgetPlanner.WPF.ViewModels.Forms;
 using BudgetPlanner.WPF.ViewModels.Items;
-using BudgetPlanner.WPF.ViewModels.Summaries;
 using BudgetPlanner.WPF.Views.Summaries;
 
 namespace BudgetPlanner.WPF.ViewModels
@@ -55,7 +54,7 @@ namespace BudgetPlanner.WPF.ViewModels
             TransactionsView = CollectionViewSource.GetDefaultView(Transactions);
             TransactionsView.Filter = o => Filter.Matches((TransactionItemViewModel)o);
 
-            Overview = new SummariesOverviewViewModel(TransactionsView, Transactions);
+            Overview = new SummariesOverviewViewModel(Transactions);
 
             AddCommand = new DelegateCommand(AddTransaction);
             UpdateCommand = new DelegateCommand(UpdateTransaction, _ => Selected != null);
@@ -149,9 +148,7 @@ namespace BudgetPlanner.WPF.ViewModels
             Transactions.Add(vm);
 
             vm.PropertyChanged += (_, __) =>
-            {
-                Overview.RaiseAll();
-            };
+            {            };
 
             vm.RefreshProperties(); 
 
@@ -209,8 +206,7 @@ namespace BudgetPlanner.WPF.ViewModels
 
             Selected.RefreshFromModel();
 
-            // Uppdatera summeringar
-            Overview.RaiseAll();
+
 
         }
 
@@ -281,8 +277,6 @@ namespace BudgetPlanner.WPF.ViewModels
             Filter.FilterRecurrence = Filter.FilterByRecurrence ? Form.TransactionRecurrence : null;
 
             TransactionsView.Refresh();
-
-            Overview.RaiseAll();
 
 
             RaisePropertyChanged(nameof(FilteredTotalIncome));

@@ -1,59 +1,45 @@
-﻿using System.Collections.Specialized;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Data;
+using BudgetPlanner.DAL.Models;
 using BudgetPlanner.WPF.ViewModels.Base;
 using BudgetPlanner.WPF.ViewModels.Items;
-using BudgetPlanner.DAL.Models;
 
-namespace BudgetPlanner.WPF.ViewModels.Summaries
+public class MonthlyForecastViewModel : ViewModelBase
 {
-    public class MonthlyForecastViewModel : ViewModelBase
+    private readonly IEnumerable<TransactionItemViewModel> _items;
+
+    public MonthlyForecastViewModel(IEnumerable<TransactionItemViewModel> items)
     {
-        private readonly ICollectionView _transactionsView;
+        _items = items;
+    }
 
-        public MonthlyForecastViewModel(ICollectionView transactionsView)
-        {
-            _transactionsView = transactionsView;
+    public decimal AnnualIncome { get; set; }
+    public decimal AnnualWorkHours { get; set; }
 
-            if (_transactionsView is INotifyCollectionChanged cc)
-            {
-                cc.CollectionChanged += (_, e) =>
-                {
-                    if (e.NewItems != null)
-                    {
-                        foreach (TransactionItemViewModel t in e.NewItems)
-                            t.PropertyChanged += (_, __) => RaiseAll();
-                    }
-                    RaiseAll();
-                };
-            }
+    public decimal HourlyRate => AnnualWorkHours == 0 ? 0 : AnnualIncome / AnnualWorkHours;
+    public decimal MonthlyIncome => AnnualIncome / 12m;
 
-            foreach (TransactionItemViewModel item in _transactionsView)
-                item.PropertyChanged += (_, __) => RaiseAll();
-        }
+    public decimal RecurringIncome => _items
+        .Where(t => t.IsActive && t.Recurrence != Recurrence.OneTime && t.Type == TransactionType.Income)
+        .Sum(t => t.NetAmount);
 
-        public decimal AnnualIncome { get; set; }
-        public decimal AnnualWorkHours { get; set; }
+    public decimal RecurringExpense => _items
+        .Where(t => t.IsActive && t.Recurrence != Recurrence.OneTime && t.Type == TransactionType.Expense)
+        .Sum(t => t.NetAmount);
 
-        public decimal HourlyRate => AnnualWorkHours == 0 ? 0 : AnnualIncome / AnnualWorkHours;
-        public decimal MonthlyIncome => AnnualIncome / 12m;
+    public decimal ForecastResult => MonthlyIncome + RecurringIncome - RecurringExpense;
 
-        public decimal RecurringNet =>
-            _transactionsView.Cast<TransactionItemViewModel>()
-                             .Where(t => t.IsActive && t.Recurrence != Recurrence.OneTime)
-                             .Sum(t => t.Type == TransactionType.Income ? t.NetAmount : -t.NetAmount);
+    public decimal MonthlyForecast => ForecastResult; // alias för XAML
 
-        public decimal MonthlyForecast => MonthlyIncome + RecurringNet;
-
-        public void RaiseAll()
-        {
-            RaisePropertyChanged(nameof(AnnualIncome));
-            RaisePropertyChanged(nameof(AnnualWorkHours));
-            RaisePropertyChanged(nameof(HourlyRate));
-            RaisePropertyChanged(nameof(MonthlyIncome));
-            RaisePropertyChanged(nameof(RecurringNet));
-            RaisePropertyChanged(nameof(MonthlyForecast));
-        }
+    public void Refresh()
+    {
+        RaisePropertyChanged(nameof(AnnualIncome));
+        RaisePropertyChanged(nameof(AnnualWorkHours));
+        RaisePropertyChanged(nameof(HourlyRate));
+        RaisePropertyChanged(nameof(MonthlyIncome));
+        RaisePropertyChanged(nameof(RecurringIncome));
+        RaisePropertyChanged(nameof(RecurringExpense));
+        RaisePropertyChanged(nameof(ForecastResult));
+        RaisePropertyChanged(nameof(MonthlyForecast));
     }
 }
