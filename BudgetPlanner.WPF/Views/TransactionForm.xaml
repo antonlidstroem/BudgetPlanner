@@ -6,21 +6,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d">
 
-    <UserControl.Resources>
-
-    </UserControl.Resources>
-
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid Margin="15">
 
-            <!-- Layout -->
+            <!-- Grid layout -->
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="140"/>
-                <!-- Etikett -->
                 <ColumnDefinition Width="260"/>
-                <!-- Input -->
                 <ColumnDefinition Width="120"/>
-                <!-- Filter -->
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
@@ -63,9 +56,7 @@
                       VerticalAlignment="Center"/>
 
             <!-- Slutdatum -->
-            <TextBlock Grid.Row="2" Grid.Column="0"
-                       Text="Slutdatum:"
-                       VerticalAlignment="Center"
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Slutdatum:" VerticalAlignment="Center"
                        Visibility="{Binding Form.ShowEndDate, Converter={StaticResource BoolToVisibilityConverter}}"/>
             <DatePicker Grid.Row="2" Grid.Column="1"
                         Width="250"
@@ -74,8 +65,7 @@
 
             <!-- Anteckning -->
             <TextBlock Grid.Row="3" Grid.Column="0" Text="Anteckning:" VerticalAlignment="Center"/>
-            <TextBox Grid.Row="3" Grid.Column="1"
-                     Width="250"
+            <TextBox Grid.Row="3" Grid.Column="1" Width="250"
                      Text="{Binding Form.TransactionDescription, Mode=TwoWay}"/>
             <CheckBox Grid.Row="3" Grid.Column="2"
                       IsChecked="{Binding Filter.FilterByDescription}"
@@ -83,20 +73,15 @@
 
             <!-- Belopp -->
             <TextBlock Grid.Row="4" Grid.Column="0" Text="Belopp:" VerticalAlignment="Center"/>
-            <TextBox Grid.Row="4" Grid.Column="1"
-                     Width="250"
-                     Text="{Binding Form.TransactionAmount,
-                                    Mode=TwoWay,
-                                    UpdateSourceTrigger=PropertyChanged,
-                                    ValidatesOnExceptions=True}"/>
+            <TextBox Grid.Row="4" Grid.Column="1" Width="250"
+                     Text="{Binding Form.TransactionAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}"/>
             <CheckBox Grid.Row="4" Grid.Column="2"
                       IsChecked="{Binding Filter.FilterByAmount}"
                       VerticalAlignment="Center"/>
 
             <!-- Kategori -->
             <TextBlock Grid.Row="5" Grid.Column="0" Text="Kategori:" VerticalAlignment="Center"/>
-            <ComboBox Grid.Row="5" Grid.Column="1"
-                      Width="250"
+            <ComboBox Grid.Row="5" Grid.Column="1" Width="250"
                       ItemsSource="{Binding Categories}"
                       SelectedItem="{Binding Form.TransactionCategory}"
                       ItemTemplate="{StaticResource CategoryComboBoxItemTemplate}"
@@ -107,8 +92,7 @@
 
             <!-- Återkommande -->
             <TextBlock Grid.Row="6" Grid.Column="0" Text="Återkommande:" VerticalAlignment="Center"/>
-            <ComboBox Grid.Row="6" Grid.Column="1"
-                      Width="250"
+            <ComboBox Grid.Row="6" Grid.Column="1" Width="250"
                       ItemsSource="{Binding Form.RecurrenceValues}"
                       SelectedItem="{Binding Form.TransactionRecurrence}"/>
             <CheckBox Grid.Row="6" Grid.Column="2"
@@ -121,63 +105,93 @@
                        Foreground="Gray"
                        TextWrapping="Wrap"
                        Text="{Binding Form.TransactionCategory.Description}"
-                       Visibility="{Binding Form.ShowDescription,
-                                    Converter={StaticResource BoolToVisibilityConverter}}"/>
+                       Visibility="{Binding Form.ShowDescription, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-            <!-- Månad (endast Yearly) -->
-            <TextBlock Grid.Row="7" Grid.Column="0"
-                       Text="Månad:"
-                       VerticalAlignment="Center"
-                       Visibility="{Binding Form.ShowMonth,
-                                    Converter={StaticResource BoolToVisibilityConverter}}"/>
-            <ComboBox Grid.Row="7" Grid.Column="1"
-                      Width="250"
+            <!-- Månad (Yearly) -->
+            <TextBlock Grid.Row="7" Grid.Column="0" Text="Månad:" VerticalAlignment="Center"
+                       Visibility="{Binding Form.ShowMonth, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            <ComboBox Grid.Row="7" Grid.Column="1" Width="250"
                       ItemsSource="{Binding Form.Months}"
                       SelectedItem="{Binding Form.TransactionMonth}"
-                      Visibility="{Binding Form.ShowMonth,
-                                   Converter={StaticResource BoolToVisibilityConverter}}"/>
+                      Visibility="{Binding Form.ShowMonth, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
             <!-- Procentsats + Brutto -->
-            <TextBlock Grid.Row="8" Grid.Column="0"
-                       Text="Procentsats:"
-                       VerticalAlignment="Center"/>
-            <StackPanel Grid.Row="8" Grid.Column="1"
-                        Orientation="Horizontal">
+            <TextBlock Grid.Row="8" Grid.Column="0" Text="Procentsats:" VerticalAlignment="Center"/>
+            <StackPanel Grid.Row="8" Grid.Column="1" Orientation="Horizontal">
                 <TextBox Width="120"
                          Text="{Binding Form.Rate}"
-                         Visibility="{Binding Form.ShowRate,
-                                      Converter={StaticResource BoolToVisibilityConverter}}"/>
+                         Visibility="{Binding Form.ShowRate, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 <CheckBox Content="Brutto"
                           Margin="10,0,0,0"
                           IsChecked="{Binding Form.IsGross}"
-                          Visibility="{Binding Form.ShowGrossNetToggle,
-                                       Converter={StaticResource BoolToVisibilityConverter}}"/>
+                          Visibility="{Binding Form.ShowGrossNetToggle, Converter={StaticResource BoolToVisibilityConverter}}"/>
             </StackPanel>
 
             <!-- Knappar -->
-            <StackPanel Grid.Row="9" Grid.ColumnSpan="3"
-                        Orientation="Horizontal"
-                        Margin="0,15,0,0">
+            <StackPanel Grid.Row="9" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="0,15,0,0">
+
+                <!-- Lägg till -->
                 <Button Content="Lägg till"
                         Width="90"
                         Margin="0,0,10,0"
-                        Command="{Binding AddCommand}"
-                        Style="{StaticResource EditModeButtonStyle}"/>
+                        Command="{Binding AddCommand}">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource EditModeButtonStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsInEditMode}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsInEditMode}" Value="False">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <!-- Uppdatera -->
                 <Button Content="Uppdatera"
                         Width="90"
                         Margin="0,0,10,0"
-                        Command="{Binding UpdateCommand}"
-                        Style="{StaticResource EditModeVisibleButtonStyle}"/>
+                        Command="{Binding UpdateCommand}">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource EditModeVisibleButtonStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsInEditMode}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsInEditMode}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <!-- Avbryt -->
                 <Button Content="Avbryt"
                         Width="90"
                         Margin="0,0,10,0"
-                        Command="{Binding CancelEditCommand}"
-                        Style="{StaticResource EditModeVisibleButtonStyle}"/>
+                        Command="{Binding CancelEditCommand}">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource EditModeVisibleButtonStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsInEditMode}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsInEditMode}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <!-- Ta bort -->
                 <Button Content="Ta bort"
                         Width="90"
                         Command="{Binding DeleteCommand}"
-                        IsEnabled="{Binding Selected,
-                                            Converter={StaticResource NullToBoolConverter}}"/>
+                        IsEnabled="{Binding Selected, Converter={StaticResource NullToBoolConverter}}"/>
             </StackPanel>
 
         </Grid>

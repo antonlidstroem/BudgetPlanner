@@ -3,70 +3,36 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:behaviors="clr-namespace:BudgetPlanner.WPF.Behaviors"
              mc:Ignorable="d">
 
     <ListView ItemsSource="{Binding TransactionsView}"
-              SelectedItem="{Binding Selected}"
-              SelectionMode="Single">
-
+              SelectionMode="Extended"
+              behaviors:ListViewSelectedItemsBehavior.SelectedItems="{Binding SelectedItems}">
         <ListView.View>
             <GridView>
-
-                <!-- Startdatum -->
-                <GridViewColumn Header="Datum"
-                                Width="95"
-                                DisplayMemberBinding="{Binding StartDate, StringFormat=d}" />
-
-                <!-- Slutdatum -->
-                <GridViewColumn Header="Slut"
-                                Width="95"
-                                DisplayMemberBinding="{Binding EndDate, StringFormat=d}" />
-
-                <!-- Anteckning -->
-                <GridViewColumn Header="Anteckning"
-                                Width="220"
-                                DisplayMemberBinding="{Binding Description}" />
-
-                <!-- Kategori -->
-                <GridViewColumn Header="Kategori"
-                                Width="140">
+                <GridViewColumn Header="Datum" Width="95" DisplayMemberBinding="{Binding StartDate, StringFormat=d}" />
+                <GridViewColumn Header="Slut" Width="95" DisplayMemberBinding="{Binding EndDate, StringFormat=d}" />
+                <GridViewColumn Header="Anteckning" Width="220" DisplayMemberBinding="{Binding Description}" />
+                <GridViewColumn Header="Kategori" Width="140">
                     <GridViewColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Category.Name, TargetNullValue='-'}"/>
                         </DataTemplate>
                     </GridViewColumn.CellTemplate>
                 </GridViewColumn>
-
-                <!-- Återkommande -->
-                <GridViewColumn Header="Återkommande"
-                                Width="110"
-                                DisplayMemberBinding="{Binding Recurrence}" />
-
-                <!-- Månad -->
-                <GridViewColumn Header="Månad"
-                                Width="80"
-                                DisplayMemberBinding="{Binding Month}" />
-
-                <!-- Procentsats -->
-                <GridViewColumn Header="Procentsats"
-                                Width="95"
-                                DisplayMemberBinding="{Binding Rate}" />
-
-                <!-- Brutto -->
+                <GridViewColumn Header="Återkommande" Width="110" DisplayMemberBinding="{Binding Recurrence}" />
+                <GridViewColumn Header="Månad" Width="80" DisplayMemberBinding="{Binding Month}" />
+                <GridViewColumn Header="Procentsats" Width="95" DisplayMemberBinding="{Binding Rate}" />
                 <GridViewColumn Header="Brutto" Width="95">
                     <GridViewColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock HorizontalAlignment="Right"
-                       Text="{Binding GrossAmount, StringFormat=C, TargetNullValue=''}"/>
+                                       Text="{Binding GrossAmount, StringFormat=C, TargetNullValue=''}"/>
                         </DataTemplate>
                     </GridViewColumn.CellTemplate>
                 </GridViewColumn>
-
-
-
-                <!-- Belopp -->
-                <GridViewColumn Header="Belopp"
-                                Width="95">
+                <GridViewColumn Header="Belopp" Width="95">
                     <GridViewColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock HorizontalAlignment="Right">
@@ -84,7 +50,6 @@
                         </DataTemplate>
                     </GridViewColumn.CellTemplate>
                 </GridViewColumn>
-
             </GridView>
         </ListView.View>
     </ListView>

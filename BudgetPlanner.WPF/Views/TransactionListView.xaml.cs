@@ -1,4 +1,6 @@
 ﻿using System.Windows.Controls;
+using BudgetPlanner.WPF.ViewModels;
+using BudgetPlanner.WPF.ViewModels.Items;
 
 namespace BudgetPlanner.WPF.Views
 {

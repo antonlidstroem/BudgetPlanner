@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Windows;
+using System.Linq;
 using BudgetPlanner.DAL.Models;
 using BudgetPlanner.WPF.ViewModels.Base;
 
@@ -10,9 +9,8 @@ namespace BudgetPlanner.WPF.ViewModels.Forms
     public class FormViewModel : ViewModelBase
     {
         public DateTime TransactionDate { get; set; } = DateTime.Today;
-        private decimal _transactionAmount;
 
-        // SUMMA
+        private decimal _transactionAmount;
         public decimal TransactionAmount
         {
             get => _transactionAmount;
@@ -25,7 +23,6 @@ namespace BudgetPlanner.WPF.ViewModels.Forms
             }
         }
 
-        // BESKRIVNING
         public string TransactionDescription { get; set; } = string.Empty;
 
         private Category? _transactionCategory;
@@ -44,19 +41,13 @@ namespace BudgetPlanner.WPF.ViewModels.Forms
                 RaisePropertyChanged(nameof(ShowGrossNetToggle));
 
                 if (ShowGrossNetToggle != true)
-                {
                     IsGross = false;
-                }
 
                 if (!ShowMonth)
-                {
                     TransactionMonth = null;
-                }
             }
         }
 
-
-        // UPPREPANDE
         private Recurrence _transactionRecurrence = Recurrence.OneTime;
         public Recurrence TransactionRecurrence
         {
@@ -70,31 +61,18 @@ namespace BudgetPlanner.WPF.ViewModels.Forms
                     RaisePropertyChanged(nameof(ShowMonth));
 
                     if (!ShowMonth)
-                    {
                         TransactionMonth = null;
-                    }
                 }
             }
         }
 
-
-
-        // TRANSAKTIONSMÅNAD
         private int? _transactionMonth;
         public int? TransactionMonth
         {
             get => _transactionMonth;
-            set
-            {
-                _transactionMonth = value;
-                RaisePropertyChanged();
-            }
+            set { _transactionMonth = value; RaisePropertyChanged(); }
         }
 
-
-
-
-        // ÅRSARBETSTID
         private decimal _annualHours = 1600;
         public decimal AnnualHours
         {
@@ -108,17 +86,9 @@ namespace BudgetPlanner.WPF.ViewModels.Forms
             }
         }
 
-        // TIMLÖN
-        public decimal HourlyRate =>
-       AnnualHours > 0 && TransactionAmount > 0
-           ? TransactionAmount / AnnualHours
-           : 0;
-
-        // MÅNADSINKOMST FRÅN TIMMAR
+        public decimal HourlyRate => AnnualHours > 0 && TransactionAmount > 0 ? TransactionAmount / AnnualHours : 0;
         public decimal MonthlyIncomeFromHours => HourlyRate * (AnnualHours / 12m);
 
-
-        // RENSA FORMULÄRET
         public void Clear()
         {
             TransactionDate = DateTime.Today;
@@ -130,55 +100,27 @@ namespace BudgetPlanner.WPF.ViewModels.Forms
             RaisePropertyChanged(string.Empty);
         }
 
-        public IEnumerable<Recurrence> RecurrenceValues { get; } =
-    Enum.GetValues(typeof(Recurrence)).Cast<Recurrence>();
-
+        public IEnumerable<Recurrence> RecurrenceValues => Enum.GetValues(typeof(Recurrence)).Cast<Recurrence>();
         public bool ShowMonth => TransactionRecurrence == Recurrence.Yearly;
-
-
-
-
-        // MÅNAD
         public IEnumerable<int> Months => Enumerable.Range(1, 12);
 
-
-
-        public bool ShowEndDate =>
-    TransactionCategory?.HasEndDate == true;
-
-        public bool ShowDescription =>
-            !string.IsNullOrWhiteSpace(TransactionCategory?.Description);
-
-
-        public bool ShowRate =>
-            TransactionCategory?.DefaultRate != null;
-
-        public bool ShowGrossNetToggle =>
-            TransactionCategory?.ToggleGrossNet == true;
-
+        public bool ShowEndDate => TransactionCategory?.HasEndDate == true;
+        public bool ShowDescription => !string.IsNullOrWhiteSpace(TransactionCategory?.Description);
+        public bool ShowRate => TransactionCategory?.DefaultRate != null;
+        public bool ShowGrossNetToggle => TransactionCategory?.ToggleGrossNet == true;
 
         private bool _isGross;
         public bool IsGross
         {
             get => _isGross;
-            set
-            {
-                _isGross = value;
-                RaisePropertyChanged();
-                RaisePropertyChanged(nameof(EffectiveAmount)); // Viktigt!
-            }
+            set { _isGross = value; RaisePropertyChanged(); RaisePropertyChanged(nameof(EffectiveAmount)); }
         }
 
         private decimal? _rate;
         public decimal? Rate
         {
             get => _rate;
-            set
-            {
-                _rate = value;
-                RaisePropertyChanged();
-                RaisePropertyChanged(nameof(EffectiveAmount)); // Viktigt!
-            }
+            set { _rate = value; RaisePropertyChanged(); RaisePropertyChanged(nameof(EffectiveAmount)); }
         }
 
         public decimal EffectiveAmount
@@ -189,7 +131,6 @@ namespace BudgetPlanner.WPF.ViewModels.Forms
                     return TransactionAmount;
 
                 var factor = Rate.Value / 100m;
-
                 return TransactionCategory.AdjustmentType == AdjustmentType.Deduction
                     ? TransactionAmount * (1 - factor)
                     : TransactionAmount * (1 + factor);
@@ -203,6 +144,17 @@ namespace BudgetPlanner.WPF.ViewModels.Forms
             set { _endDate = value; RaisePropertyChanged(); }
         }
 
+        // --- Edit mode (för knappar i UI) ---
+        private bool _isInEditMode;
+        public bool IsInEditMode
+        {
+            get => _isInEditMode;
+            set { _isInEditMode = value; RaisePropertyChanged(); }
+        }
 
+        public void SetEditMode(bool editMode)
+        {
+            IsInEditMode = editMode;
+        }
     }
 }
