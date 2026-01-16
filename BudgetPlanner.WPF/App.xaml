@@ -1,59 +1,29 @@
 ﻿<Application x:Class="BudgetPlanner.WPF.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:BudgetPlanner.WPF"
              xmlns:conv="clr-namespace:BudgetPlanner.WPF.Converters"
              StartupUri="MainWindow.xaml">
+
     <Application.Resources>
-        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-        <conv:NullToBoolConverter x:Key="NullToBoolConverter"/>
-        <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
-        
+        <ResourceDictionary>
 
-        <!-- Återanvändbar stil för kategoricomboBox -->
-        <Style x:Key="CategoryComboBoxItemStyle" TargetType="ComboBoxItem">
-            <Setter Property="Background" Value="White"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding Type}" Value="Income">
-                    <Setter Property="Background" Value="LightGreen"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Type}" Value="Expense">
-                    <Setter Property="Background" Value="LightCoral"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
+            <!-- Converters -->
+            <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <conv:NullToBoolConverter x:Key="NullToBoolConverter"/>
+            <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
 
-        <!-- Återanvändbar DataTemplate -->
-        <DataTemplate x:Key="CategoryComboBoxItemTemplate">
-            <TextBlock Text="{Binding Name}" />
-        </DataTemplate>
+            <!-- Merged Styles -->
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Views/Styles/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
 
-
-<!--Knappar-->
-        <Style x:Key="EditModeButtonStyle" TargetType="Button">
-            <Setter Property="Visibility" Value="Visible"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding IsInEditMode}" Value="True">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style x:Key="EditModeVisibleButtonStyle" TargetType="Button">
-            <Setter Property="Visibility" Value="Collapsed"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding IsInEditMode}" Value="True">
-                    <Setter Property="Visibility" Value="Visible"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-
-        
-        <!--Formulär-->
-        
-
-
-
-
+        </ResourceDictionary>
     </Application.Resources>
+    
+    
+    
+    
+    
+    
+    
 </Application>

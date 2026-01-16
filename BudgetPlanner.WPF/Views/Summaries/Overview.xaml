@@ -7,59 +7,57 @@
              d:DesignHeight="600" d:DesignWidth="800">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="10" Background="#FFF" Orientation="Vertical" >
+        <StackPanel Margin="10" Background="White" Orientation="Vertical">
 
             <!-- Månadsöversikt -->
-            <Border Padding="10" Margin="0,0,0,10" CornerRadius="6" Background="#F9F9F9">
+            <Border Style="{StaticResource SectionBorder}">
                 <StackPanel>
                     <TextBlock Text="Månadsöversikt" FontWeight="Bold" FontSize="16" Margin="0,0,0,5"/>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
-                        <TextBlock Text="Inkomster:" Width="150" FontWeight="SemiBold"/>
+                        <TextBlock Text="Inkomster:" Width="150"/>
                         <TextBlock Text="{Binding Monthly.Income, StringFormat=C}" Foreground="Green"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
-                        <TextBlock Text="Utgifter:" Width="150" FontWeight="SemiBold"/>
+                        <TextBlock Text="Utgifter:" Width="150"/>
                         <TextBlock Text="{Binding Monthly.Expense, StringFormat=C}" Foreground="Red"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
-                        <TextBlock Text="Resultat:" Width="150" FontWeight="SemiBold"/>
+                        <TextBlock Text="Resultat:" Width="150"/>
                         <TextBlock Text="{Binding Monthly.Result, StringFormat=C}" FontWeight="Bold"/>
                     </StackPanel>
                 </StackPanel>
             </Border>
 
             <!-- Årssummering -->
-            <Border Padding="10" Margin="0,0,0,10" CornerRadius="6" Background="#FFF4E5">
+            <Border Style="{StaticResource SectionBorder}" Background="#FFF4E5">
                 <StackPanel>
                     <TextBlock Text="Årssummering" FontWeight="Bold" FontSize="16" Margin="0,0,0,5"/>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
-                        <TextBlock Text="Totala inkomster:" Width="150" FontWeight="SemiBold"/>
+                        <TextBlock Text="Totala inkomster:" Width="150"/>
                         <TextBlock Text="{Binding Yearly.Income, StringFormat=C}" Foreground="Green"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
-                        <TextBlock Text="Totala utgifter:" Width="150" FontWeight="SemiBold"/>
+                        <TextBlock Text="Totala utgifter:" Width="150"/>
                         <TextBlock Text="{Binding Yearly.Expense, StringFormat=C}" Foreground="Red"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
-                        <TextBlock Text="Resultat:" Width="150" FontWeight="SemiBold"/>
+                        <TextBlock Text="Resultat:" Width="150"/>
                         <TextBlock Text="{Binding Yearly.Result, StringFormat=C}" FontWeight="Bold"/>
                     </StackPanel>
                 </StackPanel>
             </Border>
 
             <!-- Månadsprognos -->
-            <Border Padding="10" CornerRadius="6" Background="#EEF6FF">
+            <Border Style="{StaticResource SectionBorder}" Background="#EEF6FF">
                 <StackPanel>
                     <TextBlock Text="Månadsprognos" FontWeight="Bold" FontSize="16" Margin="0,0,0,5"/>
-
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                         <TextBlock Text="Årsinkomst:" Width="150"/>
-                        <TextBox Text="{Binding Forecast.AnnualIncome, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Text="{Binding Forecast.AnnualIncome, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}"/>
                     </StackPanel>
-
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                         <TextBlock Text="Årsarbetstid (timmar):" Width="150"/>
-                        <TextBox Text="{Binding Forecast.AnnualWorkHours, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Text="{Binding Forecast.AnnualWorkHours, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}"/>
                     </StackPanel>
 
                     <Separator Margin="5"/>
@@ -68,7 +66,6 @@
                         <TextBlock Text="Timlön:" Width="150" FontWeight="Bold"/>
                         <TextBlock Text="{Binding Forecast.HourlyRate, StringFormat=C}"/>
                     </StackPanel>
-
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
                         <TextBlock Text="Månadsinkomst:" Width="150" FontWeight="Bold"/>
                         <TextBlock Text="{Binding Forecast.MonthlyIncome, StringFormat=C}"/>
@@ -80,6 +77,7 @@
                     <TextBlock Text="{Binding Forecast.MonthlyForecast, StringFormat=C}" FontSize="16" FontWeight="Bold"/>
                 </StackPanel>
             </Border>
+
         </StackPanel>
     </ScrollViewer>
 </UserControl>
